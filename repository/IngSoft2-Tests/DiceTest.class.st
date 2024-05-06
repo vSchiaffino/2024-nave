@@ -1,11 +1,11 @@
 Class {
-	#name : #TestDice,
+	#name : #DiceTest,
 	#superclass : #TestCase,
 	#category : #'IngSoft2-Tests'
 }
 
 { #category : #tests }
-TestDice >> testWhenCreateDiceWithThreeLoadedDieAndSixLoadedDieItThrowsNine [
+DiceTest >> testWhenCreateDiceWithThreeLoadedDieAndSixLoadedDieItThrowsNine [
 	| aThreeLoadedDie aSixLoadedDie aDice |
 	aThreeLoadedDie := LoadedDie in: 3.
 	aSixLoadedDie := LoadedDie in: 6.
@@ -14,7 +14,7 @@ TestDice >> testWhenCreateDiceWithThreeLoadedDieAndSixLoadedDieItThrowsNine [
 ]
 
 { #category : #tests }
-TestDice >> testWhenCreateDiceWithTwoLoadedDieThrowsTwo [
+DiceTest >> testWhenCreateDiceWithTwoLoadedDieThrowsTwo [
 	| aTwoLoadedDie aDice |
 	aTwoLoadedDie  := LoadedDie in: 2.
 	aDice := Dice with: aTwoLoadedDie.

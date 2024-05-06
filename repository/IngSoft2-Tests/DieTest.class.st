@@ -1,11 +1,11 @@
 Class {
-	#name : #TestDie,
+	#name : #DieTest,
 	#superclass : #TestCase,
 	#category : #'IngSoft2-Tests'
 }
 
 { #category : #tests }
-TestDie >> should: anErrorBlock raise: exceptionClass withMessage: anErrorMessage [
+DieTest >> should: anErrorBlock raise: exceptionClass withMessage: anErrorMessage [
 	self
 		should: anErrorBlock
 		raise: exceptionClass
@@ -14,12 +14,12 @@ TestDie >> should: anErrorBlock raise: exceptionClass withMessage: anErrorMessag
 ]
 
 { #category : #tests }
-TestDie >> testErrorWhenCreateATwoFacedDie [
+DieTest >> testErrorWhenCreateATwoFacedDie [
 	self should: [ Die of: 2 ] raise: Error withMessage: 'number of faces must be greater than two'.
 ]
 
 { #category : #tests }
-TestDie >> testWhenThrowFourFacedDieReturnsBetweenOneAndFour [
+DieTest >> testWhenThrowFourFacedDieReturnsBetweenOneAndFour [
 	| aDie |
 	aDie := Die of: 4.	
 	self assert: (aDie throw between: 1 and: 4).

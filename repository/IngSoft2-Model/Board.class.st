@@ -7,7 +7,7 @@ Class {
 { #category : #'as yet unclassified' }
 Board >> moveFrom: aCell times: anAmountOfTimes [ 
 	| theCellIndex |
-	theCellIndex := (self indexOf: aCell) + anAmountOfTimes % (self size + 1).
+	theCellIndex := ((self indexOf: aCell) + anAmountOfTimes) min: self size.
 	^self at: theCellIndex.
 ]
 

@@ -2,22 +2,28 @@ Class {
 	#name : #LoadedDie,
 	#superclass : #Object,
 	#instVars : [
-		'loadedFace'
+		'sequence'
 	],
 	#category : #'IngSoft2-Tests'
 }
 
-{ #category : #evaluating }
-LoadedDie class >> in: loadedFace [
-	^ (self new) initializeWith: loadedFace.
+{ #category : #accessing }
+LoadedDie class >> sequence: aSequenceOfNumbers [
+	^ (self new) initializeWith: aSequenceOfNumbers
 ]
 
 { #category : #initialization }
-LoadedDie >> initializeWith: aLoadedFace [ 
-	loadedFace := aLoadedFace
+LoadedDie >> initializeWith: aSequenceOfNumbers [
+
+	sequence := aSequenceOfNumbers.
+	^ self
 ]
 
 { #category : #'as yet unclassified' }
 LoadedDie >> throw [
-	^loadedFace.
+
+	| dieResult |
+	dieResult := sequence removeFirst.
+	sequence addLast: dieResult.
+	^ dieResult
 ]

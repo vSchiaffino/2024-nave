@@ -5,59 +5,25 @@ Class {
 }
 
 { #category : #tests }
-BoardTest >> testWhenMoveFromACellOneTimeThenItReturnsTheAdyacentCell [
-	| aBoard aCell anotherCell yetAnotherCell|
-	aCell := Cell new.
-	anotherCell := Cell new.
-	yetAnotherCell := Cell new.
-	aBoard := Board with: aCell with: anotherCell with: yetAnotherCell.
-	self assert: (aBoard moveFrom: aCell times: 1) equals: anotherCell.
+BoardTest >> testWhenShipIsMovedToTheLastCellThenLastCellShouldBeOccupied [
+
+	| aBoard aShip someShips |
+	aBoard := Board length: 10 wormholeStart: 4 wormholeEnd: 5.
+	aShip := 'test-ship-1'.
+	someShips := OrderedCollection with: aShip.
+	aBoard at: 1 place: someShips.
+	aBoard move: aShip by: 9.
+	self assert: aBoard isLastCellOccupied
 ]
 
 { #category : #tests }
-BoardTest >> testWhenMoveFromACellTwoTimesThenItReturnsTheCellTwoCellsTowards [
-	| aBoard aCell anotherCell yetAnotherCell|
-	aCell := Cell new.
-	anotherCell := Cell new.
-	yetAnotherCell := Cell new.
-	aBoard := Board with: aCell with: anotherCell with: yetAnotherCell.
-	self assert: (aBoard moveFrom: aCell times: 2) equals: yetAnotherCell.
-]
+BoardTest >> testWhenTryToMovesOutsideBoardThenGivesTheLastCell [
 
-{ #category : #tests }
-BoardTest >> testWhenShipIsInACellThenWhereIsShouldReturnTheCell [
-	|aBoard aCell anotherCell yetAnotherCell aShip|
-	aShip := Ship withName: 'ship-test-1'.
-	aCell := Cell new.
-	anotherCell := Cell with: aShip.
-	yetAnotherCell := Cell new.
-	aBoard := Board with: aCell with: anotherCell with: yetAnotherCell.
-	
-	self assert: (aBoard whereIs: aShip) equals: anotherCell.
-	
-	
-]
-
-{ #category : #tests }
-BoardTest >> testWhenShipIsInAnotherCellThenWhereIsShouldReturnThatCell [
-	|aBoard aCell anotherCell yetAnotherCell aShip|
-	aShip := Ship withName: 'ship-test-1'.
-	aCell := Cell with: aShip.
-	anotherCell := Cell new.
-	yetAnotherCell := Cell new.
-	aBoard := Board with: aCell with: anotherCell with: yetAnotherCell.
-	
-	self assert: (aBoard whereIs: aShip) equals: aCell.
-	
-	
-]
-
-{ #category : #tests }
-BoardTest >> testWhenTryToMovesOutsideBoardThenReturnTheLastCell [
-	| aBoard aCell anotherCell yetAnotherCell|
-	aCell := Cell new.
-	anotherCell := Cell new.
-	yetAnotherCell := Cell new.
-	aBoard := Board with: aCell with: anotherCell with: yetAnotherCell.
-	self assert: (aBoard moveFrom: aCell times: 10) equals: yetAnotherCell .
+	| aBoard aShip someShips |
+	aBoard := Board length: 10 wormholeStart: 3 wormholeEnd: 4.
+	aShip := 'test-ship-1'.
+	someShips := OrderedCollection with: aShip.
+	aBoard at: 1 place: someShips.
+	aBoard move: aShip by: 12.
+	self assert: (aBoard indexOfCellWith: aShip) equals: 10
 ]

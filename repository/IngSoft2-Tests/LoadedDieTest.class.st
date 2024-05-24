@@ -5,15 +5,24 @@ Class {
 }
 
 { #category : #tests }
-LoadedDieTest >> testWhenLoadedFaceIsFiveItThrowsFive [
+LoadedDieTest >> testWhenSequenceIsOnlyFiveItThrowsFiveEverytime [
 	|aLoadedDieInFive|
-	aLoadedDieInFive := LoadedDie in: 5.
+	aLoadedDieInFive := LoadedDie sequence: #(5) asOrderedCollection.
 	self assert:  (aLoadedDieInFive throw) equals: 5.
 ]
 
 { #category : #tests }
-LoadedDieTest >> testWhenLoadedFaceIsSixItThrowsSix [
-	|aLoadedDieInSix|
-	aLoadedDieInSix := LoadedDie in: 6.
-	self assert:  (aLoadedDieInSix throw) equals: 6.
+LoadedDieTest >> testWhenSequenceIsOnlySixItThrowsSixEverytime [
+	|aLoadedDieInFive|
+	aLoadedDieInFive := LoadedDie sequence: #(6) asOrderedCollection.
+	self assert:  (aLoadedDieInFive throw) equals: 6.
+]
+
+{ #category : #tests }
+LoadedDieTest >> testWhenSequenceIsTwoFourFiveItFollowTheSequence [
+	|aLoadedDie |
+	aLoadedDie := LoadedDie sequence: #(2 4 5) asOrderedCollection.
+	self assert:  (aLoadedDie throw) equals: 2.
+	self assert:  (aLoadedDie throw) equals: 4.
+	self assert:  (aLoadedDie throw) equals: 5.
 ]

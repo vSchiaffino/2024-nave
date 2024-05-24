@@ -1,20 +1,50 @@
 Class {
 	#name : #Cell,
-	#superclass : #OrderedCollection,
+	#superclass : #Object,
+	#instVars : [
+		'ships'
+	],
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #testing }
+{ #category : #'as yet unclassified' }
 Cell >> enters: aShip [
-	self add: aShip.
+
+	self subclassResponsibility
+]
+
+{ #category : #'as yet unclassified' }
+Cell >> entersAll: someShips [
+
+	someShips do: [ :eachShip | self enters: eachShip ]
+]
+
+{ #category : #accessing }
+Cell >> firstShip [
+
+	^ ships first
 ]
 
 { #category : #testing }
+Cell >> includes: aShip [
+
+	^ ships includes: aShip
+]
+
+{ #category : #initialization }
+Cell >> initialize [
+
+	ships := OrderedCollection new
+]
+
+{ #category : #'as yet unclassified' }
 Cell >> isOccupied [
-	^self notEmpty.
+
+	^ ships notEmpty
 ]
 
-{ #category : #testing }
+{ #category : #'as yet unclassified' }
 Cell >> leaves: aShip [
-	self remove: aShip.
+
+	ships remove: aShip
 ]

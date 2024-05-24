@@ -6,17 +6,21 @@ Class {
 
 { #category : #tests }
 DiceTest >> testWhenCreateDiceWithThreeLoadedDieAndSixLoadedDieItThrowsNine [
-	| aThreeLoadedDie aSixLoadedDie aDice |
-	aThreeLoadedDie := LoadedDie in: 3.
-	aSixLoadedDie := LoadedDie in: 6.
-	aDice := Dice with: aThreeLoadedDie with: aSixLoadedDie.
-	self assert: aDice throw equals: 9.	
+
+	| aThreeLoadedDie aSixLoadedDie aDice someDice |
+	aThreeLoadedDie := LoadedDie sequence: #( 3 ) asOrderedCollection.
+	aSixLoadedDie := LoadedDie sequence: #( 6 ) asOrderedCollection.
+	someDice := Set with: aThreeLoadedDie with: aSixLoadedDie.
+	aDice := Dice withAll: someDice.
+	self assert: aDice throw equals: 9
 ]
 
 { #category : #tests }
 DiceTest >> testWhenCreateDiceWithTwoLoadedDieThrowsTwo [
-	| aTwoLoadedDie aDice |
-	aTwoLoadedDie  := LoadedDie in: 2.
-	aDice := Dice with: aTwoLoadedDie.
-	self assert: aDice throw equals: 2.
+
+	| aTwoLoadedDie aDice someDice |
+	aTwoLoadedDie := LoadedDie sequence: #( 2 ) asOrderedCollection.
+	someDice := Set with: aTwoLoadedDie.
+	aDice := Dice withAll: someDice.
+	self assert: aDice throw equals: 2
 ]

@@ -9,12 +9,13 @@ Class {
 
 { #category : #'instance creation' }
 Die class >> of: anAmountOfFaces [
-	self verifyGreaterThanTwo: anAmountOfFaces.
+
+	self verifyAreValid: anAmountOfFaces.
 	^ self new initializeWith: anAmountOfFaces
 ]
 
 { #category : #'instance creation' }
-Die class >> verifyGreaterThanTwo: anAmountOfFaces [
+Die class >> verifyAreValid: anAmountOfFaces [
 
 	anAmountOfFaces <= 2 ifTrue: [
 		Error signal: 'number of faces must be greater than two' ]
@@ -22,10 +23,12 @@ Die class >> verifyGreaterThanTwo: anAmountOfFaces [
 
 { #category : #'as yet unclassified' }
 Die >> initializeWith: anAmountOfFaces [
+
 	faces := anAmountOfFaces
 ]
 
 { #category : #'as yet unclassified' }
 Die >> throw [
-	^ faces atRandom.
+
+	^ faces atRandom
 ]

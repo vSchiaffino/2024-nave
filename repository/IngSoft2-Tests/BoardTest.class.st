@@ -12,6 +12,6 @@ BoardTest >> testWhenTryToMovesMoreThanTheLastCellItShouldMoveToTheFirstCell [
 	aShip := Ship named: 'test-ship-1'.
 	someShips := OrderedCollection with: aShip.
 	aBoard at: 1 place: someShips.
-	aBoard move: aShip by: 10.
+	aBoard move: aShip by: 10 ifCollision: [].
 	self assert: (aBoard indexOfCellWith: aShip) equals: 1
 ]

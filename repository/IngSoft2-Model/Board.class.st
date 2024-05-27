@@ -12,7 +12,11 @@ Class {
 
 { #category : #'as yet unclassified' }
 Board class >> length: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation [
-	^(self new) initializeWithLength: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation
+
+	^ self new
+		  initializeWithLength: anAmountOfCells
+		  wormholeStart: aWormholeStartLocation
+		  wormholeEnd: aWormholeEndLocation
 ]
 
 { #category : #accessing }
@@ -24,7 +28,8 @@ Board >> at: index place: someShips [
 ]
 
 { #category : #accessing }
-Board >> indexOfCellWith: aShip [ 
+Board >> indexOfCellWith: aShip [
+
 	^ cells detectIndex: [ :eachCell | eachCell includes: aShip ]
 ]
 
@@ -43,7 +48,7 @@ Board >> initializeWithLength: anAmountOfCells wormholeStart: aWormholeStartLoca
 ]
 
 { #category : #'as yet unclassified' }
-Board >> move: aShip by: times [
+Board >> move: aShip by: times ifCollision: aBlockIfCollision [
 
 	| actualCell nextCell actualCellIndex nextCellIndex lapsDone |
 	actualCell := self whereIs: aShip.
@@ -53,7 +58,14 @@ Board >> move: aShip by: times [
 	aShip addLaps: lapsDone.
 	nextCell := cells at: nextCellIndex.
 	actualCell leaves: aShip.
-	nextCell enters: aShip
+	nextCell enters: aShip.
+	nextCell ifHasTwoShips: aBlockIfCollision
+]
+
+{ #category : #'as yet unclassified' }
+Board >> moveToTheStart: aShip [
+
+	cells first enters: aShip
 ]
 
 { #category : #'as yet unclassified' }

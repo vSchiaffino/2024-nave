@@ -19,6 +19,13 @@ Cell >> entersAll: someShips [
 	someShips do: [ :eachShip | self enters: eachShip ]
 ]
 
+{ #category : #'as yet unclassified' }
+Cell >> ifHasTwoShips: aBlockIfHasTwoShips [
+
+	ships size = 2 ifTrue: [
+		aBlockIfHasTwoShips value: ships first value: ships second ]
+]
+
 { #category : #testing }
 Cell >> includes: aShip [
 

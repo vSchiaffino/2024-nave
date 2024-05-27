@@ -9,6 +9,7 @@ Class {
 
 { #category : #'instance creation' }
 WormholeCell class >> newPair [
+
 	| firstWormhole secondWormhole aWormholePair |
 	firstWormhole := self new.
 	secondWormhole := self new.

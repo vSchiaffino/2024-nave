@@ -24,6 +24,7 @@ SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: some
 
 { #category : #accessing }
 SpaceshipGame >> indexOfCellWith: aShipName [
+
 	| aShip |
 	aShip := ships detect: [ :eachShip | eachShip name = aShipName ].
 	^ board indexOfCellWith: aShip
@@ -31,9 +32,11 @@ SpaceshipGame >> indexOfCellWith: aShipName [
 
 { #category : #initialization }
 SpaceshipGame >> initializeWith: someShipNames lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation [
+
 	lapsToWin := aNumberOfLapsToWin.
 	dice := someDice.
-	ships := someShipNames collect: [:eachShipName | Ship named: eachShipName].
+	ships := someShipNames collect: [ :eachShipName |
+		         Ship named: eachShipName ].
 	board := Board
 		         length: anAmountOfCells
 		         wormholeStart: aWormholeStartLocation
@@ -51,11 +54,21 @@ SpaceshipGame >> isOver [
 { #category : #'as yet unclassified' }
 SpaceshipGame >> playsNextTurn [
 
-	| shipToPlay diceResult |
+	| shipToPlay diceResult actualShipDiceResult collidingShipDiceResult loserShip |
 	self verifyIsNotOver.
 	diceResult := dice throw.
 	shipToPlay := ships first.
-	board move: shipToPlay by: diceResult.
+	board
+		move: shipToPlay
+		by: diceResult
+		ifCollision: [ :actualShip :collidingShip |
+			actualShipDiceResult := dice throw.
+			collidingShipDiceResult := dice throw.
+			loserShip := actualShipDiceResult >= collidingShipDiceResult
+				             ifTrue: [ collidingShip ]
+				             ifFalse: [ actualShip ].
+			loserShip removeShield.
+			board moveToTheStart: loserShip ].
 
 	ships removeFirst.
 	ships addLast: shipToPlay

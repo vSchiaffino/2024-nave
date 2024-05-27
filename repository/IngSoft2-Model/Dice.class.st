@@ -9,8 +9,8 @@ Class {
 
 { #category : #'instance creation' }
 Dice class >> withAll: someDice [
-	^ (self new ) initializeWith: someDice.
-	
+
+	^ self new initializeWith: someDice
 ]
 
 { #category : #initialization }

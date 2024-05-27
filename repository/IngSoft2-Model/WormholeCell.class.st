@@ -46,9 +46,3 @@ WormholeCell >> teleport: aShip [
 
 	ships add: aShip
 ]
-
-
-{ #category : #initialization }
-WormholeCell >> initializeWith: aWormholeCell [ 
-	wormholeEnd := aWormholeCell
-]

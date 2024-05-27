@@ -19,12 +19,6 @@ Cell >> entersAll: someShips [
 	someShips do: [ :eachShip | self enters: eachShip ]
 ]
 
-{ #category : #accessing }
-Cell >> firstShip [
-
-	^ ships first
-]
-
 { #category : #testing }
 Cell >> includes: aShip [
 

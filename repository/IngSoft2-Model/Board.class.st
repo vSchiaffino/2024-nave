@@ -11,7 +11,6 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-
 Board class >> length: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation [
 	^(self new) initializeWithLength: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation
 ]
@@ -24,13 +23,9 @@ Board >> at: index place: someShips [
 	theCell entersAll: someShips
 ]
 
-{ #category : #testing }
-Board >> indexOfCellWith: aShip [
-
-	| cellWithAShip |
-	cellWithAShip := self whereIs: aShip.
-	^ (1 to: cells size) detect: [ :index |
-		  (cells at: index) = cellWithAShip ]
+{ #category : #accessing }
+Board >> indexOfCellWith: aShip [ 
+	^ cells detectIndex: [ :eachCell | eachCell includes: aShip ]
 ]
 
 { #category : #initialization }
@@ -47,20 +42,16 @@ Board >> initializeWithLength: anAmountOfCells wormholeStart: aWormholeStartLoca
 	^ self
 ]
 
-{ #category : #testing }
-Board >> isLastCellOccupied [
-
-	^ cells last isOccupied
-]
-
 { #category : #'as yet unclassified' }
-Board >> move: aShip by: anAmountOfTimes [
+Board >> move: aShip by: times [
 
-	| actualCell nextCell theCellIndex |
+	| actualCell nextCell actualCellIndex nextCellIndex lapsDone |
 	actualCell := self whereIs: aShip.
-	theCellIndex := (cells indexOf: actualCell) + anAmountOfTimes min:
-		                cells size.
-	nextCell := cells at: theCellIndex.
+	actualCellIndex := cells indexOf: actualCell.
+	nextCellIndex := actualCellIndex - 1 + times % cells size + 1.
+	lapsDone := actualCellIndex - 1 + times // cells size.
+	aShip addLaps: lapsDone.
+	nextCell := cells at: nextCellIndex.
 	actualCell leaves: aShip.
 	nextCell enters: aShip
 ]
@@ -69,10 +60,4 @@ Board >> move: aShip by: anAmountOfTimes [
 Board >> whereIs: aShip [
 
 	^ cells detect: [ :eachCell | eachCell includes: aShip ]
-]
-
-{ #category : #'as yet unclassified' }
-Board >> winner [
-
-	^ cells last firstShip
 ]

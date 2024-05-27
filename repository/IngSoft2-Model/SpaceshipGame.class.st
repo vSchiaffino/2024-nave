@@ -4,16 +4,18 @@ Class {
 	#instVars : [
 		'board',
 		'dice',
-		'ships'
+		'ships',
+		'lapsToWin'
 	],
 	#category : #'IngSoft2-Model'
 }
 
 { #category : #'as yet unclassified' }
-SpaceshipGame class >> with: someShips using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation [
+SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation [
 
 	^ self new
 		  initializeWith: someShips
+		  lapsToWin: aNumberOfLapsToWin
 		  using: someDice
 		  withCells: anAmountOfCells
 		  wormholeStart: aWormholeStartLocation
@@ -21,28 +23,29 @@ SpaceshipGame class >> with: someShips using: someDice withCells: anAmountOfCell
 ]
 
 { #category : #accessing }
-SpaceshipGame >> indexOfCellWith: aShip [
-
-	^board indexOfCellWith: aShip
+SpaceshipGame >> indexOfCellWith: aShipName [
+	| aShip |
+	aShip := ships detect: [ :eachShip | eachShip name = aShipName ].
+	^ board indexOfCellWith: aShip
 ]
 
 { #category : #initialization }
-SpaceshipGame >> initializeWith: someShips using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation [
-
+SpaceshipGame >> initializeWith: someShipNames lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation [
+	lapsToWin := aNumberOfLapsToWin.
 	dice := someDice.
+	ships := someShipNames collect: [:eachShipName | Ship named: eachShipName].
 	board := Board
 		         length: anAmountOfCells
 		         wormholeStart: aWormholeStartLocation
 		         wormholeEnd: aWormholeEndLocation.
-	board at: 1 place: someShips.
-	ships := someShips.
+	board at: 1 place: ships.
 	^ self
 ]
 
 { #category : #'as yet unclassified' }
 SpaceshipGame >> isOver [
 
-	^ board isLastCellOccupied
+	^ ships anySatisfy: [ :eachShip | eachShip lapsCompleted >= lapsToWin ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -75,5 +78,5 @@ SpaceshipGame >> winner [
 
 	self verifyIsOver.
 
-	^ board winner
+	^ (ships detect: [ :eachShip | eachShip lapsCompleted >= lapsToWin ]) name.
 ]

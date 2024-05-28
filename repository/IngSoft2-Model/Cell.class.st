@@ -55,3 +55,8 @@ Cell >> leaves: aShip [
 
 	ships remove: aShip
 ]
+
+{ #category : #accessing }
+Cell >> ships [
+	^ships.
+]

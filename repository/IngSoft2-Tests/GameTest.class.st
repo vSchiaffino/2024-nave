@@ -50,6 +50,111 @@ GameTest >> testWhenAShipCompletedTheRequiredLapsThenShouldBeOver [
 ]
 
 { #category : #tests }
+GameTest >> testWhenAShipEntersIntoAMoonwalkCellAndOneShipGoesBackMoreThanTheFirstCellThenItShouldNotCountThePreviousLap [
+
+	| aShip someShips aGame someDice someCells anotherShip |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 12 6 7 ) asOrderedCollection)).
+	someCells := OrderedCollection new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: (MoonwalkCell times: 3).
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	
+	aGame := SpaceshipGameWithFixedBoard
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: someCells.
+
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+
+	self deny: aGame isOver
+]
+
+{ #category : #tests }
+GameTest >> testWhenAShipEntersIntoAMoonwalkCellThenItShouldStayInThatCell [
+
+	| aShip someShips aGame someDice someCells anotherShip yetAnotherShip |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	yetAnotherShip := 'test-ship-3'.
+	someShips := OrderedCollection
+		             with: aShip
+		             with: anotherShip
+		             with: yetAnotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 3 4 6 ) asOrderedCollection)).
+	someCells := OrderedCollection new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: (MoonwalkCell times: 3).
+	someCells add: NormalCell new.
+	aGame := SpaceshipGameWithFixedBoard
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+
+	self assert: (aGame indexOfCellWith: yetAnotherShip) equals: 7.
+]
+
+{ #category : #tests }
+GameTest >> testWhenAShipEntersIntoAMoonwalkCellWithThreeStepsThenAllTheOtherShipsShouldGoBackThreeSteps [
+
+	| aShip someShips aGame someDice someCells anotherShip yetAnotherShip |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	yetAnotherShip := 'test-ship-3'.
+	someShips := OrderedCollection
+		             with: aShip
+		             with: anotherShip
+		             with: yetAnotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 3 4 6 ) asOrderedCollection)).
+	someCells := OrderedCollection new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: (MoonwalkCell times: 3).
+	someCells add: NormalCell new.
+	aGame := SpaceshipGameWithFixedBoard
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+
+	self assert: (aGame indexOfCellWith: aShip) equals: 1.
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 2
+]
+
+{ #category : #tests }
 GameTest >> testWhenHasTwoLapsAndAShipCompletedTwoLapsShouldBeOver [
 
 	| aShip someShips aGame someDice anotherShip |

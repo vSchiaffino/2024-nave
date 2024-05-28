@@ -93,6 +93,16 @@ Board >> move: aShip by: times ifCollision: aBlockIfCollision [
 ]
 
 { #category : #'as yet unclassified' }
+Board >> moveAllShips: times except: aShip [
+	| allShips |
+	allShips := (cells collect: [:cell | cell ships]) flattened asOrderedCollection.
+	allShips remove: aShip.
+	
+	allShips do: [ :eachShip | self move: eachShip by: times ]
+	
+]
+
+{ #category : #'as yet unclassified' }
 Board >> moveToTheStart: aShip [
 	| actualCell |
 	actualCell := self whereIs: aShip.

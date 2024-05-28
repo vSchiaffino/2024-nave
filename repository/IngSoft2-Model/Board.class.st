@@ -64,7 +64,9 @@ Board >> move: aShip by: times ifCollision: aBlockIfCollision [
 
 { #category : #'as yet unclassified' }
 Board >> moveToTheStart: aShip [
-
+	| actualCell |
+	actualCell := self whereIs: aShip.
+	actualCell leaves: aShip.
 	cells first enters: aShip
 ]
 

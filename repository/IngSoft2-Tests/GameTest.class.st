@@ -228,6 +228,117 @@ GameTest >> testWhenShipEntersToABlackholeCellThenShouldGoBackFourCells [
 ]
 
 { #category : #tests }
+GameTest >> testWhenShipEntersToAHyperSpaceJumpCellAndThatShipLosesTwoTimesShouldLoseTwoTurns [
+
+	| aShip someShips aGame someDice someCells anotherShip |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll: (Set with:
+			             (LoadedDie sequence:
+				              #( 1 5 9 10 6 1 9 10 2 1 ) asOrderedCollection)).
+	someCells := OrderedCollection new.
+	someCells add: NormalCell new.
+	someCells add: HyperSpaceJump new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new. ""
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	aGame := SpaceshipGameWithFixedBoard
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 10.
+	self assert: (aGame indexOfCellWith: aShip) equals: 1
+]
+
+{ #category : #tests }
+GameTest >> testWhenShipEntersToAHyperSpaceJumpCellThenShouldGoForwardFourCells [
+
+	| aShip someShips aGame someDice someCells |
+	aShip := 'test-ship-1'.
+	someShips := OrderedCollection with: aShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 ) asOrderedCollection)).
+	someCells := OrderedCollection new.
+	someCells add: NormalCell new.
+	someCells add: HyperSpaceJump new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	aGame := SpaceshipGameWithFixedBoard 
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells.
+	aGame playsNextTurn.
+
+	self assert: (aGame indexOfCellWith: aShip) equals: 6.
+]
+
+{ #category : #tests }
+GameTest >> testWhenShipEntersToAHyperSpaceJumpCellThreeTimesInARowItShouldLoseTwoTurns [
+
+	| aShip someShips aGame someDice someCells |
+	aShip := 'test-ship-1'.
+	someShips := OrderedCollection with: aShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 1 1 10 10 ) asOrderedCollection)).
+	someCells := OrderedCollection new.
+	someCells add: NormalCell new.
+	someCells add: HyperSpaceJump new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: HyperSpaceJump new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: HyperSpaceJump new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	aGame := SpaceshipGameWithFixedBoard
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+
+	self deny: aGame isOver.
+	self assert: (aGame indexOfCellWith: aShip) equals: 16.
+]
+
+{ #category : #tests }
 GameTest >> testWhenShipIsInFirstCellAndAskForTheIndexOfThatCellShouldBeTheFirstCell [
 
 	| aShip aGame someShips someDice |

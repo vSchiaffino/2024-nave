@@ -31,6 +31,11 @@ WormholeCell class >> newPairIn: someCells start: wormholeStartLocation end: wor
 	someCells at: wormholeEndLocation put: (wormholePair at: 2)
 ]
 
+{ #category : #'as yet unclassified' }
+WormholeCell >> applyEffectTo: aShip in: aBoard [
+	wormholeEnd teleport: aShip.
+]
+
 { #category : #testing }
 WormholeCell >> enters: aShip [
 	wormholeEnd teleport: aShip

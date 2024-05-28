@@ -95,6 +95,34 @@ GameTest >> testWhenNoShipCompletedTheLapsThenGameShouldNotBeOver [
 ]
 
 { #category : #tests }
+GameTest >> testWhenShipEntersToABlackholeCellThenShouldGoBackFourCells [
+
+	| aShip someShips aGame someDice someCells |
+	aShip := 'test-ship-1'.
+	someShips := OrderedCollection with: aShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 6 ) asOrderedCollection)).
+	someCells := OrderedCollection new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: BlackholeCell new.
+	someCells add: NormalCell new.
+	aGame := SpaceshipGameWithFixedBoard 
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells.
+	aGame playsNextTurn.
+
+	self assert: (aGame indexOfCellWith: aShip) equals: 3.
+]
+
+{ #category : #tests }
 GameTest >> testWhenShipIsInFirstCellAndAskForTheIndexOfThatCellShouldBeTheFirstCell [
 
 	| aShip aGame someShips someDice |

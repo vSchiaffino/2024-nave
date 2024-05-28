@@ -8,9 +8,15 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-Cell >> enters: aShip [
+Cell >> applyEffectTo: aShip in: aBoard [
 
 	self subclassResponsibility
+]
+
+{ #category : #'as yet unclassified' }
+Cell >> enters: aShip [
+
+	ships add: aShip
 ]
 
 { #category : #'as yet unclassified' }

@@ -61,7 +61,51 @@ Board >> indexOfCellWith: aShip [
 { #category : #initialization }
 Board >> initializeWithLength: anAmountOfCells lengthInParsecs: aLengthInParsecs wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation [
 
-	| wormholePair |
+	| wormholePair notRandomCellsCount randomCellsCount normalCellsCount blackholeCellsCount hyperspacejumpCount moonwalkCount hyperjumpCount atomicbombCount cellsDistribution normalsCells blackholeCells hyperspacejumpCells moonwalkCells hyperjumpCells atomicbombCells roundDifference |
+	notRandomCellsCount := 2. "The wormhole cells are not random, and they are 2"
+	randomCellsCount := anAmountOfCells - 2.
+
+	normalCellsCount := (0.4 * randomCellsCount) floor.
+	blackholeCellsCount := (0.2 * randomCellsCount) floor.
+	hyperspacejumpCount := (0.2 * randomCellsCount) floor.
+	moonwalkCount := (0.1 * randomCellsCount) floor.
+	hyperjumpCount := (0.08 * randomCellsCount) floor.
+	atomicbombCount := (0.02 * randomCellsCount) floor.
+
+	roundDifference := randomCellsCount - normalCellsCount
+	                   - blackholeCellsCount - hyperspacejumpCount
+	                   - moonwalkCount - hyperjumpCount - atomicbombCount.
+	normalCellsCount := normalCellsCount + roundDifference.
+
+	normalsCells := OrderedCollection new.
+	normalCellsCount timesRepeat: [ normalsCells add: NormalCell new ].
+
+	blackholeCells := OrderedCollection new.
+	blackholeCellsCount timesRepeat: [ blackholeCells add: BlackholeCell new ].
+
+	hyperspacejumpCells := OrderedCollection new.
+	hyperspacejumpCount timesRepeat:  [
+		hyperspacejumpCells add: HyperSpaceJump new ].
+
+	moonwalkCells := OrderedCollection new.
+	moonwalkCount timesRepeat: [ moonwalkCells  add: (MoonwalkCell times: (5 atRandom)) ]. "Pongo N como un random entre 1 y 5"
+
+	hyperjumpCells := OrderedCollection new.
+	hyperjumpCount timesRepeat: [
+		hyperjumpCells add:
+			(HyperJumpCell withParsecs: #( 50 10 5 ) asOrderedCollection) ]. "Valor fijo de parsecs, despues se puede cambiar"
+
+	atomicbombCells := OrderedCollection new.
+	atomicbombCount timesRepeat: [ atomicbombCells add: AtomicBombCell new ].
+
+	cellsDistribution := OrderedCollection new.
+	cellsDistribution addAll: normalsCells.
+	cellsDistribution addAll: blackholeCells.
+	cellsDistribution addAll: hyperspacejumpCells.
+	cellsDistribution addAll: moonwalkCells.
+	cellsDistribution addAll: hyperjumpCells.
+	cellsDistribution addAll: atomicbombCells.
+
 	cells := OrderedCollection new.
 	wormholePair := WormholeCell newPair.
 	1 to: anAmountOfCells do: [ :index | cells add: NormalCell new ].

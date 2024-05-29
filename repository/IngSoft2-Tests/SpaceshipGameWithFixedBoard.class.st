@@ -4,14 +4,15 @@ Class {
 	#category : #'IngSoft2-Tests'
 }
 
-{ #category : #'as yet unclassified' }
-SpaceshipGameWithFixedBoard class >> with: someShipNames lapsToWin: aNumberOfLapsToWin using: someDice withCells: someCells [
+{ #category : #initialization }
+SpaceshipGameWithFixedBoard class >> initializeWithAllNormalCells: aBoardLength ships: someShipNames lapsToWin: anAmountOfLapsToWin using: someDice lengthInParsecs: aLengthInParsecs [
 
 	^ self new
-		  initializeWith: someShipNames
-		  lapsToWin: aNumberOfLapsToWin
+		  initializeWithAllNormalCells: aBoardLength
+		  ships: someShipNames
+		  lapsToWin: anAmountOfLapsToWin
 		  using: someDice
-		  withCells: someCells
+		  lengthInParsecs: aLengthInParsecs
 ]
 
 { #category : #'as yet unclassified' }
@@ -28,6 +29,20 @@ SpaceshipGameWithFixedBoard >> initializeWith: someShipNames lapsToWin: aNumberO
 		         Ship named: eachShipName ].
 	board := FixedBoard
 		         initializeWith: someCells
+		         lengthInParsecs: aLengthInParsecs.
+	board at: 1 place: ships.
+	^ self
+]
+
+{ #category : #initialization }
+SpaceshipGameWithFixedBoard >> initializeWithAllNormalCells: length ships: someShipNames lapsToWin: aNumberOfLapsToWin using: someDice lengthInParsecs: aLengthInParsecs [
+
+	lapsToWin := aNumberOfLapsToWin.
+	dice := someDice.
+	ships := someShipNames collect: [ :eachShipName |
+		         Ship named: eachShipName ].
+	board := FixedBoard
+		         initializeWithAllNormalCells: length
 		         lengthInParsecs: aLengthInParsecs.
 	board at: 1 place: ships.
 	^ self

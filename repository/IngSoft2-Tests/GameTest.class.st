@@ -70,6 +70,29 @@ GameTest >> testWhenAShipCompletedTheRequiredLapsThenShouldBeOver [
 ]
 
 { #category : #tests }
+GameTest >> testWhenAShipCompletedThreeLapsNumberOfLapsShouldBeThree [
+
+	| aShip aGame someDice someShips |
+	aShip := 'test-ship-1'.
+	someShips := OrderedCollection with: aShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 10 10 11 ) asOrderedCollection)).
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 4
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	self assert: (aGame lapsOf: aShip) equals: 3
+]
+
+{ #category : #tests }
 GameTest >> testWhenAShipEntersIntoAMoonwalkCellAndOneShipGoesBackMoreThanTheFirstCellThenItShouldNotCountThePreviousLap [
 
 	| aShip someShips aGame someDice someCells anotherShip |

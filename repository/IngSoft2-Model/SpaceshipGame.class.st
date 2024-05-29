@@ -54,6 +54,13 @@ SpaceshipGame >> isOver [
 ]
 
 { #category : #'as yet unclassified' }
+SpaceshipGame >> lapsOf: aShipName [
+	| aShip |
+	aShip := ships detect: [ :eachShip | eachShip name = aShipName ].
+	^aShip lapsCompleted.
+]
+
+{ #category : #'as yet unclassified' }
 SpaceshipGame >> playsNextTurn [
 
 	| shipToPlay diceResult actualShipDiceResult collidingShipDiceResult loserShip |

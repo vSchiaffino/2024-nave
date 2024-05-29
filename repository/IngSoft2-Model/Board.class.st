@@ -20,6 +20,13 @@ Board class >> length: anAmountOfCells wormholeStart: aWormholeStartLocation wor
 ]
 
 { #category : #'as yet unclassified' }
+Board >> allShips [
+
+	^ (cells collect: [ :cell | cell ships ]) flattened
+		  asOrderedCollection
+]
+
+{ #category : #'as yet unclassified' }
 Board >> applyEffectTo: aShip [
 
 	| aCell |
@@ -78,36 +85,33 @@ Board >> move: aShip by: times [
 ]
 
 { #category : #'as yet unclassified' }
-Board >> move: aShip by: times ifCollision: aBlockIfCollision [
+Board >> moveAllShips: times except: aShip [
 
-	| actualCell nextCell actualCellIndex nextCellIndex lapsDone |
-	actualCell := self whereIs: aShip.
-	actualCellIndex := cells indexOf: actualCell.
-	nextCellIndex := actualCellIndex - 1 + times % cells size + 1.
-	lapsDone := actualCellIndex - 1 + times // cells size.
-	aShip addLaps: lapsDone.
-	nextCell := cells at: nextCellIndex.
-	actualCell leaves: aShip.
-	nextCell enters: aShip.
-	nextCell ifHasTwoShips: aBlockIfCollision
+	| allShips |
+	allShips := self allShips.
+	allShips remove: aShip.
+	allShips do: [ :eachShip | self move: eachShip by: times ]
 ]
 
 { #category : #'as yet unclassified' }
-Board >> moveAllShips: times except: aShip [
-	| allShips |
-	allShips := (cells collect: [:cell | cell ships]) flattened asOrderedCollection.
-	allShips remove: aShip.
-	
-	allShips do: [ :eachShip | self move: eachShip by: times ]
-	
+Board >> moveAllShipsToTheStart [
+
+	self allShips do: [ :eachShip | self moveToTheStart: eachShip ]
 ]
 
 { #category : #'as yet unclassified' }
 Board >> moveToTheStart: aShip [
+
 	| actualCell |
 	actualCell := self whereIs: aShip.
 	actualCell leaves: aShip.
 	cells first enters: aShip
+]
+
+{ #category : #removing }
+Board >> removeShieldFromAllShips [
+
+	self allShips do: [ :eachShip | eachShip removeShield ]
 ]
 
 { #category : #'as yet unclassified' }

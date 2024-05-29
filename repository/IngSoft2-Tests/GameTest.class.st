@@ -200,6 +200,45 @@ GameTest >> testWhenNoShipCompletedTheLapsThenGameShouldNotBeOver [
 ]
 
 { #category : #tests }
+GameTest >> testWhenSecondShipsLosesTwoShieldsAndThenAnotherShieldDueToAtomicBombEffectThenItShouldLoseTwoTurns [
+
+	| aShip someShips aGame someDice someCells anotherShip |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll: (Set with:
+			             (LoadedDie sequence:
+				              #( 1 1 10 5 1 2 10 5 1 1 1 ) asOrderedCollection)).
+	someCells := OrderedCollection new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: AtomicBombCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+
+	aGame := SpaceshipGameWithFixedBoard
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	"Loser Turn"
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	"Loser Turn"
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	
+	self assert: (aGame indexOfCellWith: aShip) equals: 3.
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 1
+]
+
+{ #category : #tests }
 GameTest >> testWhenShipEntersToABlackholeCellThenShouldGoBackFourCells [
 
 	| aShip someShips aGame someDice someCells |
@@ -336,6 +375,39 @@ GameTest >> testWhenShipEntersToAHyperSpaceJumpCellThreeTimesInARowItShouldLoseT
 
 	self deny: aGame isOver.
 	self assert: (aGame indexOfCellWith: aShip) equals: 16.
+]
+
+{ #category : #tests }
+GameTest >> testWhenShipEntersToAnAtomicBombCellAllShipsShouldGoBackToTheBeginning [
+
+	| aShip someShips aGame someDice someCells anotherShip yetAnotherShip |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	yetAnotherShip := 'test-ship-3'.
+	someShips := OrderedCollection with: aShip with: anotherShip with: yetAnotherShip.
+	someDice := Dice withAll: (Set with:
+			             (LoadedDie sequence:
+				              #( 1 2 5 ) asOrderedCollection)).
+	someCells := OrderedCollection new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: AtomicBombCell new.
+
+	aGame := SpaceshipGameWithFixedBoard
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+
+	self assert: (aGame indexOfCellWith: yetAnotherShip) equals: 1.
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 1.
+	self assert: (aGame indexOfCellWith: aShip) equals: 1
 ]
 
 { #category : #tests }
@@ -562,6 +634,48 @@ GameTest >> testWhenTheFirstShipCompletedTheRequiredLapsThenShouldBeTheWinner [
 		         wormholeEnd: 3.
 	aGame playsNextTurn.
 	self assert: aGame winner equals: aShip
+]
+
+{ #category : #tests }
+GameTest >> testWhenThirdShipEntersToAnAtomicBombCellAndThenFirstShipRollsNineInATenCellBoardWithOneLapItShouldWin [
+
+	| aShip someShips aGame someDice someCells anotherShip yetAnotherShip |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	yetAnotherShip := 'test-ship-3'.
+	someShips := OrderedCollection
+		             with: aShip
+		             with: anotherShip
+		             with: yetAnotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 2 5 10 ) asOrderedCollection)).
+	someCells := OrderedCollection new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: AtomicBombCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+
+	aGame := SpaceshipGameWithFixedBoard
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+	aGame playsNextTurn.
+
+	self assert: aGame isOver.
+	self assert: (aGame indexOfCellWith: yetAnotherShip) equals: 1.
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 1.
+	self assert: (aGame indexOfCellWith: aShip) equals: 1
 ]
 
 { #category : #tests }

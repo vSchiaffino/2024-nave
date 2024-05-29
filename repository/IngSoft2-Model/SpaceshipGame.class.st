@@ -11,7 +11,7 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation [
+SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation lengthInParsecs: aLengthInParsecs [
 
 	^ self new
 		  initializeWith: someShips
@@ -20,6 +20,7 @@ SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: some
 		  withCells: anAmountOfCells
 		  wormholeStart: aWormholeStartLocation
 		  wormholeEnd: aWormholeEndLocation
+		  lengthInParsecs: aLengthInParsecs
 ]
 
 { #category : #accessing }
@@ -31,7 +32,7 @@ SpaceshipGame >> indexOfCellWith: aShipName [
 ]
 
 { #category : #initialization }
-SpaceshipGame >> initializeWith: someShipNames lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation [
+SpaceshipGame >> initializeWith: someShipNames lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation lengthInParsecs: aLengthInParsecs [
 
 	lapsToWin := aNumberOfLapsToWin.
 	dice := someDice.
@@ -39,6 +40,7 @@ SpaceshipGame >> initializeWith: someShipNames lapsToWin: aNumberOfLapsToWin usi
 		         Ship named: eachShipName ].
 	board := Board
 		         length: anAmountOfCells
+		         lengthInParsecs: aLengthInParsecs
 		         wormholeStart: aWormholeStartLocation
 		         wormholeEnd: aWormholeEndLocation.
 	board at: 1 place: ships.

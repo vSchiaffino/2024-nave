@@ -2,7 +2,8 @@ Class {
 	#name : #Board,
 	#superclass : #Object,
 	#instVars : [
-		'cells'
+		'cells',
+		'lengthInParsecs'
 	],
 	#classInstVars : [
 		'cells'
@@ -11,10 +12,11 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-Board class >> length: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation [
+Board class >> length: anAmountOfCells lengthInParsecs: anAmountOfLengthInParsecs wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation [
 
 	^ self new
 		  initializeWithLength: anAmountOfCells
+		  lengthInParsecs: anAmountOfLengthInParsecs
 		  wormholeStart: aWormholeStartLocation
 		  wormholeEnd: aWormholeEndLocation
 ]
@@ -57,7 +59,7 @@ Board >> indexOfCellWith: aShip [
 ]
 
 { #category : #initialization }
-Board >> initializeWithLength: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation [
+Board >> initializeWithLength: anAmountOfCells lengthInParsecs: aLengthInParsecs wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation [
 
 	| wormholePair |
 	cells := OrderedCollection new.
@@ -82,6 +84,14 @@ Board >> move: aShip by: times [
 	nextCell := cells at: nextCellIndex.
 	actualCell leaves: aShip.
 	nextCell enters: aShip
+]
+
+{ #category : #'as yet unclassified' }
+Board >> move: aShip byParsecs: parsecsToMove [ 
+	| cellsToMove parsecsPerCell|
+	parsecsPerCell := lengthInParsecs // cells size.
+	cellsToMove := parsecsToMove // parsecsPerCell.
+	self move: aShip by: cellsToMove
 ]
 
 { #category : #'as yet unclassified' }

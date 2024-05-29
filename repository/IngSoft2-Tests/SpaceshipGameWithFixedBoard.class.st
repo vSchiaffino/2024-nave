@@ -14,14 +14,21 @@ SpaceshipGameWithFixedBoard class >> with: someShipNames lapsToWin: aNumberOfLap
 		  withCells: someCells
 ]
 
+{ #category : #'as yet unclassified' }
+SpaceshipGameWithFixedBoard class >> with: someShipNames lapsToWin: anAmountOfLapsToWin using: someDice withCells: someCells lengthInParsecs: aLengthInParsecs [ 
+	^(self new) initializeWith: someShipNames lapsToWin: anAmountOfLapsToWin using: someDice  withCells: someCells lengthInParsecs: aLengthInParsecs
+]
+
 { #category : #initialization }
-SpaceshipGameWithFixedBoard >> initializeWith: someShipNames lapsToWin: aNumberOfLapsToWin using: someDice withCells: someCells [
+SpaceshipGameWithFixedBoard >> initializeWith: someShipNames lapsToWin: aNumberOfLapsToWin using: someDice withCells: someCells lengthInParsecs: aLengthInParsecs [
 
 	lapsToWin := aNumberOfLapsToWin.
 	dice := someDice.
 	ships := someShipNames collect: [ :eachShipName |
 		         Ship named: eachShipName ].
-	board := FixedBoard withCells: someCells.
+	board := FixedBoard
+		         initializeWith: someCells
+		         lengthInParsecs: aLengthInParsecs.
 	board at: 1 place: ships.
 	^ self
 ]

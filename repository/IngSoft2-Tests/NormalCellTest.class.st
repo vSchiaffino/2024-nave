@@ -118,7 +118,7 @@ NormalCellTest >> testWhenCellHasNoShipThenShouldNotIncludeAShip [
 ]
 
 { #category : #tests }
-NormalCellTest >> testWhenShipEntersToABlackholeCellThenLandsInAOccupiedCellThenTheLoserShipShouldMoveToTheBeginning [ 
+NormalCellTest >> testWhenShipEntersToABlackholeCellThenLandsInAOccupiedCellThenTheLoserShipShouldMoveToTheBeginning [
 
 	| aShip someShips aGame someDice someCells anotherShip |
 	aShip := 'test-ship-1'.
@@ -140,12 +140,13 @@ NormalCellTest >> testWhenShipEntersToABlackholeCellThenLandsInAOccupiedCellThen
 		         with: someShips
 		         lapsToWin: 1
 		         using: someDice
-		         withCells: someCells.
+		         withCells: someCells
+		         lengthInParsecs: 100.
 	aGame playsNextTurn.
 	aGame playsNextTurn.
 
 	self assert: (aGame indexOfCellWith: aShip) equals: 3.
-	self assert: (aGame indexOfCellWith: anotherShip) equals: 1.
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 1
 ]
 
 { #category : #tests }
@@ -171,7 +172,8 @@ NormalCellTest >> testWhenShipEntersToABlackholeCellThenLandsIntoAnotherBlackhol
 		         with: someShips
 		         lapsToWin: 1
 		         using: someDice
-		         withCells: someCells.
+		         withCells: someCells
+		         lengthInParsecs: 100.
 	aGame playsNextTurn.
 
 	self assert: (aGame indexOfCellWith: aShip) equals: 3

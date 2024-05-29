@@ -77,6 +77,31 @@ SpaceshipGame >> playsNextTurn [
 ]
 
 { #category : #'as yet unclassified' }
+SpaceshipGame >> ranking [
+
+	| sortedCollection shipPosition shipLaps shipPositionArray rankingBlock |
+	self verifyIsOver.
+	rankingBlock := [ :firstShip :secondShip |
+	                firstShip second = secondShip second
+		                ifTrue: [ firstShip third >= secondShip third ]
+		                ifFalse: [ firstShip second > secondShip second ] ].
+
+	sortedCollection := SortedCollection sortBlock: rankingBlock.
+
+	ships do: [ :eachShip |
+		shipPosition := board indexOfCellWith: eachShip.
+		shipLaps := eachShip lapsCompleted.
+		shipPositionArray := OrderedCollection
+			                     with: eachShip
+			                     with: shipLaps
+			                     with: shipPosition.
+		sortedCollection add: shipPositionArray ].
+
+
+	^ sortedCollection collect: [ :position | position first name ]
+]
+
+{ #category : #'as yet unclassified' }
 SpaceshipGame >> skipsNextTurn [
 	| shipToPlay |
 	shipToPlay := ships first.

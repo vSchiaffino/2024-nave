@@ -3,7 +3,6 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'name',
-		'laps',
 		'shields',
 		'penalty'
 	],
@@ -14,12 +13,6 @@ Class {
 Ship class >> named: aName [
 
 	^ self new initializeWith: aName
-]
-
-{ #category : #adding }
-Ship >> addLaps: aNumberOfLaps [
-
-	laps := laps + aNumberOfLaps
 ]
 
 { #category : #'as yet unclassified' }
@@ -36,16 +29,9 @@ Ship >> applyTurnPenaltyElse: aBlockIfNotPenalized [
 Ship >> initializeWith: aName [
 
 	name := aName.
-	laps := 0.
 	shields := 3.
 	penalty := 0.
 	^ self
-]
-
-{ #category : #'as yet unclassified' }
-Ship >> lapsCompleted [
-
-	^ laps
 ]
 
 { #category : #accessing }

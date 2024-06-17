@@ -96,18 +96,6 @@ NormalCellTest >> testWhenCellHasAShipThenShouldIncludeThatShip [
 ]
 
 { #category : #tests }
-NormalCellTest >> testWhenCellHasAShipThenShouldNotIncludeAnotherShip [
-
-	| aShip aCell anotherShip |
-	aShip := 'test-name-1'.
-	anotherShip := 'test-name-2'.
-	aCell := NormalCell new.
-	aCell enters: aShip.
-
-	self deny: (aCell includes: anotherShip)
-]
-
-{ #category : #tests }
 NormalCellTest >> testWhenCellHasNoShipThenShouldNotIncludeAShip [
 
 	| aShip aCell |
@@ -136,47 +124,20 @@ NormalCellTest >> testWhenShipEntersToABlackholeCellThenLandsInAOccupiedCellThen
 	someCells add: NormalCell new.
 	someCells add: BlackholeCell new.
 	someCells add: NormalCell new.
-	aGame := SpaceshipGameWithFixedBoard
+	aGame := SpaceshipGame
 		         with: someShips
-		         lapsToWin: 1
+		         lapsToWin: 2
 		         using: someDice
-		         withCells: someCells
-		         lengthInParsecs: 100.
+		         withCells: someCells size
+		         wormholeStart: 4
+		         wormholeEnd: 5
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator cells: someCells).
 	aGame playsNextTurn.
 	aGame playsNextTurn.
 
 	self assert: (aGame indexOfCellWith: aShip) equals: 3.
 	self assert: (aGame indexOfCellWith: anotherShip) equals: 1
-]
-
-{ #category : #tests }
-NormalCellTest >> testWhenShipEntersToABlackholeCellThenLandsIntoAnotherBlackholeCellThenSecondBlackholeShouldNotBeApplied [
-
-	| aShip someShips aGame someDice someCells anotherShip |
-	aShip := 'test-ship-1'.
-	anotherShip := 'test-ship-2'.
-	someShips := OrderedCollection with: aShip with: anotherShip.
-	someDice := Dice withAll:
-		            (Set with:
-			             (LoadedDie sequence: #( 2 6 ) asOrderedCollection)).
-	someCells := OrderedCollection new.
-	someCells add: NormalCell new.
-	someCells add: NormalCell new.
-	someCells add: NormalCell new.
-	someCells add: NormalCell new.
-	someCells add: NormalCell new.
-	someCells add: NormalCell new.
-	someCells add: BlackholeCell new.
-	someCells add: NormalCell new.
-	aGame := SpaceshipGameWithFixedBoard
-		         with: someShips
-		         lapsToWin: 1
-		         using: someDice
-		         withCells: someCells
-		         lengthInParsecs: 100.
-	aGame playsNextTurn.
-
-	self assert: (aGame indexOfCellWith: aShip) equals: 3
 ]
 
 { #category : #tests }

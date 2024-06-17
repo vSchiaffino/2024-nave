@@ -4,14 +4,52 @@ Class {
 	#instVars : [
 		'board',
 		'dice',
-		'ships',
-		'lapsToWin'
+		'ships'
 	],
 	#category : #'IngSoft2-Model'
 }
 
 { #category : #'as yet unclassified' }
 SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation lengthInParsecs: aLengthInParsecs [
+
+	| defaultCellGenerator defaultProbabilities |
+	defaultProbabilities := OrderedCollection
+		                        with: {
+				                        0.4.
+				                        [ NormalCell new ] }
+		                        with: {
+				                        0.2.
+				                        [ BlackholeCell new ] }
+		                        with: {
+				                        0.2.
+				                        [ HyperSpaceJumpCell new ] }
+		                        with: {
+				                        0.1.
+				                        [ MoonwalkCell times: 5 atRandom ] }
+		                        with: {
+				                        0.08.
+				                        [
+				                        HyperJumpCell withParsecs:
+					                        #( 50 10 5 ) asOrderedCollection ] }
+		                        with: {
+				                        0.02.
+				                        [ AtomicBombCell new ] }.
+	defaultCellGenerator := CellGenerator
+		                        length: anAmountOfCells
+		                        probabilites: defaultProbabilities.
+	^ self
+		  with: someShips
+		  lapsToWin: aNumberOfLapsToWin
+		  using: someDice
+		  withCells: anAmountOfCells
+		  wormholeStart: aWormholeStartLocation
+		  wormholeEnd: aWormholeEndLocation
+		  lengthInParsecs: aLengthInParsecs
+		  cellGenerator: defaultCellGenerator
+]
+
+{ #category : #'as yet unclassified' }
+SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation lengthInParsecs: aLengthInParsecs cellGenerator: aCellGenerator [
 
 	^ self new
 		  initializeWith: someShips
@@ -21,6 +59,7 @@ SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: some
 		  wormholeStart: aWormholeStartLocation
 		  wormholeEnd: aWormholeEndLocation
 		  lengthInParsecs: aLengthInParsecs
+		  cellGenerator: aCellGenerator
 ]
 
 { #category : #accessing }
@@ -32,32 +71,33 @@ SpaceshipGame >> indexOfCellWith: aShipName [
 ]
 
 { #category : #initialization }
-SpaceshipGame >> initializeWith: someShipNames lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation lengthInParsecs: aLengthInParsecs [
+SpaceshipGame >> initializeWith: someShipNames lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation lengthInParsecs: aLengthInParsecs cellGenerator: aCellGenerator [
 
-	lapsToWin := aNumberOfLapsToWin.
 	dice := someDice.
 	ships := someShipNames collect: [ :eachShipName |
 		         Ship named: eachShipName ].
 	board := Board
-		         length: anAmountOfCells
+		         withShips: ships
 		         lengthInParsecs: aLengthInParsecs
+		         lapsToWin: aNumberOfLapsToWin
 		         wormholeStart: aWormholeStartLocation
-		         wormholeEnd: aWormholeEndLocation.
-	board at: 1 place: ships.
+		         wormholeEnd: aWormholeEndLocation
+		         cellGenerator: aCellGenerator.
 	^ self
 ]
 
 { #category : #'as yet unclassified' }
 SpaceshipGame >> isOver [
 
-	^ ships anySatisfy: [ :eachShip | eachShip lapsCompleted >= lapsToWin ]
+	^ board anyShipCompletedAllLaps.
 ]
 
 { #category : #'as yet unclassified' }
 SpaceshipGame >> lapsOf: aShipName [
+
 	| aShip |
 	aShip := ships detect: [ :eachShip | eachShip name = aShipName ].
-	^aShip lapsCompleted.
+	^ board lapsOf: aShip.
 ]
 
 { #category : #'as yet unclassified' }
@@ -86,26 +126,7 @@ SpaceshipGame >> playsNextTurn [
 { #category : #'as yet unclassified' }
 SpaceshipGame >> ranking [
 
-	| sortedCollection shipPosition shipLaps shipPositionArray rankingBlock |
-	self verifyIsOver.
-	rankingBlock := [ :firstShip :secondShip |
-	                firstShip second = secondShip second
-		                ifTrue: [ firstShip third >= secondShip third ]
-		                ifFalse: [ firstShip second > secondShip second ] ].
-
-	sortedCollection := SortedCollection sortBlock: rankingBlock.
-
-	ships do: [ :eachShip |
-		shipPosition := board indexOfCellWith: eachShip.
-		shipLaps := eachShip lapsCompleted.
-		shipPositionArray := OrderedCollection
-			                     with: eachShip
-			                     with: shipLaps
-			                     with: shipPosition.
-		sortedCollection add: shipPositionArray ].
-
-
-	^ sortedCollection collect: [ :position | position first name ]
+	^board orderedShips collect: [ :ship | ship name ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -133,6 +154,5 @@ SpaceshipGame >> verifyIsOver [
 SpaceshipGame >> winner [
 
 	self verifyIsOver.
-
-	^ (ships detect: [ :eachShip | eachShip lapsCompleted >= lapsToWin ]) name.
+	^ board shipWithCompletedLaps name
 ]

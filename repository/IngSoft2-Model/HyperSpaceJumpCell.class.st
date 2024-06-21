@@ -9,5 +9,4 @@ HyperSpaceJumpCell >> applyEffectTo: aShip in: aBoard [
 
 	aShip removeShield.
 	aBoard move: aShip by: 4
-	
 ]

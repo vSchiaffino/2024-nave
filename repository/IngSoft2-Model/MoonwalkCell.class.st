@@ -15,10 +15,12 @@ MoonwalkCell class >> times: aNumberOfTimes [
 
 { #category : #'as yet unclassified' }
 MoonwalkCell >> applyEffectTo: aShip in: aBoard [
-	aBoard moveAllShips: times negated except: aShip.
+
+	aBoard moveAllShips: times negated except: aShip
 ]
 
 { #category : #initialization }
-MoonwalkCell >> initializeWith: aNumberOfTimes [ 
-	times := aNumberOfTimes.
+MoonwalkCell >> initializeWith: aNumberOfTimes [
+
+	times := aNumberOfTimes
 ]

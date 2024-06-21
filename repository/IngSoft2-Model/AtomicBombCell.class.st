@@ -6,6 +6,7 @@ Class {
 
 { #category : #'as yet unclassified' }
 AtomicBombCell >> applyEffectTo: aShip in: aBoard [
+
 	aBoard removeShieldFromAllShips.
-	aBoard moveAllShipsToTheStart.
+	aBoard moveAllShipsToTheStart
 ]

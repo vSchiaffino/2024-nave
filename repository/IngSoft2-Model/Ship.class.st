@@ -2,17 +2,24 @@ Class {
 	#name : #Ship,
 	#superclass : #Object,
 	#instVars : [
-		'name',
 		'shields',
-		'penalty'
+		'penalty',
+		'name',
+		'allies'
 	],
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #'instance creation' }
-Ship class >> named: aName [
+{ #category : #'as yet unclassified' }
+Ship >> addAlly: anAlly [
 
-	^ self new initializeWith: aName
+	allies add: anAlly
+]
+
+{ #category : #accessing }
+Ship >> allies [
+
+	^ allies
 ]
 
 { #category : #'as yet unclassified' }
@@ -25,9 +32,16 @@ Ship >> applyTurnPenaltyElse: aBlockIfNotPenalized [
 		ifFalse: [ aBlockIfNotPenalized value ]
 ]
 
+{ #category : #'as yet unclassified' }
+Ship >> ifIsNotAlly: aShip do: aBlockIfNotAlly [
+
+	(allies includes: aShip) ifFalse: [ aBlockIfNotAlly value ]
+]
+
 { #category : #initialization }
 Ship >> initializeWith: aName [
 
+	allies := OrderedCollection new.
 	name := aName.
 	shields := 3.
 	penalty := 0.
@@ -41,6 +55,12 @@ Ship >> name [
 ]
 
 { #category : #removing }
+Ship >> removeAlly: aMercenaryShip [
+
+	allies remove: aMercenaryShip ifAbsent: [  ]
+]
+
+{ #category : #removing }
 Ship >> removeShield [
 
 	shields := shields - 1.
@@ -49,5 +69,6 @@ Ship >> removeShield [
 
 { #category : #'as yet unclassified' }
 Ship >> restoreShields [
+
 	shields := 3
 ]

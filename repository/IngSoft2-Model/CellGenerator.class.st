@@ -30,11 +30,11 @@ CellGenerator class >> verifyAreValid: someProbabilities [
 { #category : #translating }
 CellGenerator >> generate [
 
-	| cells random randomGenerator |
-	randomGenerator := Random new.
+	| cells random seed |
+	seed := Random new.
 	cells := OrderedCollection new.
 	1 to: numberOfCells do: [ :index |
-		random := randomGenerator next.
+		random := seed next.
 		cellProbabilities do: [ :eachCellProbability |
 			eachCellProbability addCellTo: cells ifIsInRange: random ] ].
 	^ cells

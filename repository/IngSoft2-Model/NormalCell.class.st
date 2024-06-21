@@ -6,5 +6,6 @@ Class {
 
 { #category : #'as yet unclassified' }
 NormalCell >> applyEffectTo: aShip in: aBoard [
+
 	
 ]

@@ -133,8 +133,8 @@ NormalCellTest >> testWhenShipEntersToABlackholeCellThenLandsInAOccupiedCellThen
 		         wormholeEnd: 5
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
 	self assert: (aGame indexOfCellWith: aShip) equals: 3.
 	self assert: (aGame indexOfCellWith: anotherShip) equals: 1

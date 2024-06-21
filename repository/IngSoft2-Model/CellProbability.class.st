@@ -22,15 +22,16 @@ CellProbability class >> cellCreation: aCellCreationBlock rangeStart: aRangeStar
 CellProbability >> addCellTo: someCells ifIsInRange: aNumber [
 
 	| createdCell |
-	(aNumber between: rangeStart and: rangeEnd) ifTrue: [
-		createdCell := cellCreationBlock value.
-		someCells add: createdCell ]
+	(aNumber between: rangeStart and: rangeEnd) ifFalse: [ ^ self ].
+	createdCell := cellCreationBlock value.
+	someCells add: createdCell
 ]
 
 { #category : #initialization }
 CellProbability >> initializeWith: aCellCreationBlock rangeStart: aRangeStart rangeEnd: aRangeEnd [
+
 	cellCreationBlock := aCellCreationBlock.
 	rangeStart := aRangeStart.
 	rangeEnd := aRangeEnd.
-	^ self.
+	^ self
 ]

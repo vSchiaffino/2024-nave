@@ -5,7 +5,8 @@ Class {
 		'cells',
 		'lengthInParsecs',
 		'lapsPerShip',
-		'lapsToWin'
+		'lapsToWin',
+		'lastCellEffectUsed'
 	],
 	#classInstVars : [
 		'cells'
@@ -28,7 +29,7 @@ Board class >> withShips: someShips lengthInParsecs: anAmountOfLengthInParsecs l
 { #category : #'as yet unclassified' }
 Board >> allShips [
 
-	^ lapsPerShip keys asSet 
+	^ lapsPerShip keys asSet
 ]
 
 { #category : #'as yet unclassified' }
@@ -43,7 +44,16 @@ Board >> applyEffectTo: aShip [
 
 	| aCell |
 	aCell := self whereIs: aShip.
+	lastCellEffectUsed := aCell.
 	aCell applyEffectTo: aShip in: self
+]
+
+{ #category : #'as yet unclassified' }
+Board >> applyLastEffectTo: aShipName [
+
+	| aShip |
+	aShip := self allShips detect: [ :ship | ship name = aShipName ].
+	lastCellEffectUsed applyEffectTo: aShip in: self
 ]
 
 { #category : #'as yet unclassified' }
@@ -63,6 +73,7 @@ Board >> indexOfCellWith: aShip [
 { #category : #initialization }
 Board >> initializeWith: someShips lengthInParsecs: aLengthInParsecs lapsToWin: aNumberOfLapsToWin wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation cellGenerator: aCellGenerator [
 
+	lastCellEffectUsed := NormalCell new.
 	lengthInParsecs := aLengthInParsecs.
 	lapsToWin := aNumberOfLapsToWin.
 	lapsPerShip := Dictionary new.
@@ -84,27 +95,23 @@ Board >> lapsOf: aShip [
 ]
 
 { #category : #'as yet unclassified' }
-Board >> move: aShip by: times [
+Board >> move: aShip by: anAmount [
 
-	| actualCell nextCell actualCellIndex nextCellIndex actualShipLaps lapsChangeAmount |
+	| actualCell nextCell actualCellIndex nextCellIndex actualShipLaps lapsChangeAmount cellsToMove |
+	cellsToMove := anAmount toCellsOf: self.
+
 	actualCell := self whereIs: aShip.
 	actualCellIndex := cells indexOf: actualCell.
-	actualShipLaps := lapsPerShip at: aShip.
-	nextCellIndex := actualCellIndex - 1 + times % cells size + 1.
-	lapsChangeAmount := actualCellIndex - 1 + times // cells size.
-	
-	lapsPerShip at: aShip put: actualShipLaps + lapsChangeAmount.
+	nextCellIndex := actualCellIndex - 1 + cellsToMove % cells size + 1.
+
+	aShip updateLapsIfRequired: [
+		actualShipLaps := lapsPerShip at: aShip.
+		lapsChangeAmount := actualCellIndex - 1 + cellsToMove // cells size.
+		lapsPerShip at: aShip put: actualShipLaps + lapsChangeAmount ].
+
 	nextCell := cells at: nextCellIndex.
 	actualCell leaves: aShip.
 	nextCell enters: aShip
-]
-
-{ #category : #'as yet unclassified' }
-Board >> move: aShip byParsecs: parsecsToMove [ 
-	| cellsToMove parsecsPerCell|
-	parsecsPerCell := lengthInParsecs // cells size.
-	cellsToMove := parsecsToMove // parsecsPerCell.
-	self move: aShip by: cellsToMove
 ]
 
 { #category : #'as yet unclassified' }
@@ -138,6 +145,18 @@ Board >> orderedShips [
 	sortByRankBlock := [ :aShip :anotherShip |
 	                   (self rank: aShip) >= (self rank: anotherShip) ].
 	^ (self allShips sorted: sortByRankBlock) asOrderedCollection
+]
+
+{ #category : #'as yet unclassified' }
+Board >> parsecsPerCell [
+
+	^ lengthInParsecs // cells size
+]
+
+{ #category : #'as yet unclassified' }
+Board >> placeAtTheStart: aShip [
+
+	cells first enters: aShip
 ]
 
 { #category : #accessing }

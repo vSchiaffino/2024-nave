@@ -2,28 +2,30 @@ Class {
 	#name : #HyperJumpCell,
 	#superclass : #Cell,
 	#instVars : [
-		'parsecs'
+		'lengths'
 	],
 	#category : #'IngSoft2-Model'
 }
 
 { #category : #'as yet unclassified' }
-HyperJumpCell class >> withParsecs: someParsecs [ 
-	^ self new initializeWith: someParsecs.
+HyperJumpCell class >> withLengths: aCollectionOfLenghts [
+
+	^ self new initializeWith: aCollectionOfLenghts
 ]
 
 { #category : #'as yet unclassified' }
 HyperJumpCell >> applyEffectTo: aShip in: aBoard [
 
-	| aParsecAmount |
-	aParsecAmount := parsecs first.
-	parsecs removeFirst.
-	parsecs addLast: aParsecAmount.
-	aBoard move: aShip byParsecs: aParsecAmount
+	| anAmountToMove |
+	anAmountToMove := lengths first.
+	lengths removeFirst.
+	lengths addLast: anAmountToMove.
+	aBoard move: aShip by: anAmountToMove
 ]
 
 { #category : #initialization }
-HyperJumpCell >> initializeWith: someParsecs [ 
-	parsecs := someParsecs.
-	^self
+HyperJumpCell >> initializeWith: someLengths [
+
+	lengths := someLengths.
+	^ self
 ]

@@ -24,8 +24,79 @@ GameTest >> testARandomMatchEnds [
 		         lengthInParsecs: 200.
 		
 	[aGame isOver] whileFalse: [ 
-		aGame playsNextTurn.
+		aGame throwDice.
 	]
+]
+
+{ #category : #tests }
+GameTest >> testIfAShipPlaysAInstantCardAndItsNotItsTurnShouldApplyEffect [
+
+	| aShip aGame someShips someDice cardsToDraw anotherShip anAccelerationCard aCancellationCard shipCards anotherShipCards |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 1 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: AccelerationCard new
+		               with: CancellationCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	shipCards := aGame cardsOf: aShip.
+	anotherShipCards := aGame cardsOf: anotherShip.
+	anAccelerationCard := shipCards first.
+	aCancellationCard := anotherShipCards second.
+	aCancellationCard targetCard: anAccelerationCard. 
+	aGame playCard: anAccelerationCard by: aShip.
+	aGame throwDice. "turno test-ship-1"
+	aGame playCard: aCancellationCard by: anotherShip.
+	aGame throwDice. "turno test-ship-2"
+
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 2
+]
+
+{ #category : #tests }
+GameTest >> testIfAShipPlaysAPermanentCardAndItsNotItsTurnShouldThrowAnError [
+
+	| aShip aGame someShips someDice cards cardsToDraw anotherShip anAccelerationCard anotherAccelerationCard |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: AccelerationCard new
+		               with: AccelerationCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	cards := aGame cardsOf: aShip.
+	anAccelerationCard := cards first.
+	anotherAccelerationCard := cards second.
+	aGame playCard: anAccelerationCard by: aShip.
+	aGame throwDice. "turno test-ship-1"
+
+	self
+		should: [aGame playCard: anotherAccelerationCard by: aShip]
+		raise: Error
+		withMessage: 'it is not your turn!'
 ]
 
 { #category : #tests }
@@ -54,6 +125,231 @@ GameTest >> testIfGameIsNotOverThenWinnerShouldThrowError [
 ]
 
 { #category : #tests }
+GameTest >> testIfNoTurnWasPlayedThenRepeatCardShouldNotHaveEffect [
+
+	| aShip aGame someShips someDice anotherShip deck cardsToDraw aRepeatCard |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 4 4 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: RepeatCard new
+		               with: RepeatCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	deck := aGame cardsOf: aShip.
+	aRepeatCard := deck first.
+	aRepeatCard targetShip: aShip.
+	aGame playCard: aRepeatCard by: aShip.
+	self assert: (aGame indexOfCellWith: aShip) equals: 1
+]
+
+{ #category : #tests }
+GameTest >> testIfStackTwoSpeedCardsThenShouldMoveTwoCellsMore [
+
+	| aShip aGame someShips someDice anotherShip aSpeedCard deck anotherSpeedCard cardsToDraw |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 4 4 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: SpeedCard new
+		               with: SpeedCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	deck := aGame cardsOf: aShip.
+	aSpeedCard := deck first.
+	anotherSpeedCard := deck second.
+	aSpeedCard targetShip: 'test-ship-1'.
+	anotherSpeedCard targetShip: 'test-ship-1'.
+	aGame playCard: aSpeedCard by: aShip.
+	aGame playCard: anotherSpeedCard by: aShip.
+	aGame throwDice.
+	self assert: (aGame indexOfCellWith: aShip) equals: 7
+]
+
+{ #category : #tests }
+GameTest >> testIfTryToUseTheSameCardAgainShouldRaiseError [
+
+	| aShip aGame someShips someDice anotherShip aSpeedCard deck someCardToDraw |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 4 4 ) asOrderedCollection)).
+	someCardToDraw := OrderedCollection
+		                  with: SpeedCard new
+		                  with: SpeedCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: someCardToDraw).
+	deck := aGame cardsOf: aShip.
+	aSpeedCard := deck first.
+	aSpeedCard targetShip: aShip.
+	aGame playCard: aSpeedCard by: aShip.
+	self
+		should: [ aGame playCard: aSpeedCard by: aShip ]
+		raise: Error
+		withMessage: 'that card is not in deck'
+]
+
+{ #category : #tests }
+GameTest >> testWhenAMercenaryLosesABattleItsAllyShouldNotMoveToTheStart [
+
+	| aShip aGame someShips someDice cards cardsToDraw aMercenaryCard anotherShip someMercenaries aMercenaryShip |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence:
+				              #( 8 1 1 10 5 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: MercenaryCard new
+		               with: MercenaryCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 4
+		         wormholeEnd: 5
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+
+	cards := aGame cardsOf: aShip.
+	aMercenaryCard := cards first.
+	aGame playCard: aMercenaryCard by: aShip.
+	aGame throwDice. "turno test-ship-1"
+	aGame throwDice. "turno de test-ship-2"
+	aGame throwDice. "turno de mercenary"
+
+	someMercenaries := aGame mercenariesOf: aShip.
+	aMercenaryShip := someMercenaries first.
+	self assert: (aGame indexOfCellWith: aMercenaryShip) equals: 1.
+	self assert: (aGame indexOfCellWith: aShip) equals: 9
+]
+
+{ #category : #tests }
+GameTest >> testWhenAMercenaryShipLosesThreeTimesThenShouldLoseTwoTurns [
+
+	| aShip aGame someShips someDice cards cardsToDraw aMercenaryCard anotherShip someMercenaries aMercenaryShip |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll: (Set with: (LoadedDie sequence:
+				              #( 1 5 5 10 9 1 1 6 10 9 1 1 7 10 9 1 1 1 1 )
+					              asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: MercenaryCard new
+		               with: MercenaryCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 100
+		         wormholeStart: 98
+		         wormholeEnd: 99
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	cards := aGame cardsOf: aShip.
+	aMercenaryCard := cards first.
+	aGame playCard: aMercenaryCard by: aShip.
+	aGame throwDice. "turno test-ship-1"
+	aGame throwDice. "turno test-ship-2"
+	aGame throwDice. "turno de mercenaria"
+
+	aGame throwDice. "turno test-ship-1"
+	aGame throwDice. "turno test-ship-2"
+	aGame throwDice. "turno de mercenaria"
+
+	aGame throwDice. "turno test-ship-1"
+	aGame throwDice. "turno test-ship-2"
+	aGame throwDice. "turno de mercenaria"
+
+	aGame throwDice. "turno test-ship-1"
+	aGame throwDice. "turno test-ship-2"
+	aGame throwDice. "turno de mercenaria pero esta penalizada"
+
+	aGame throwDice. "turno test-ship-1"
+	aGame throwDice. "turno test-ship-2"
+	aGame throwDice. "turno de mercenaria pero esta penalizada"
+
+	someMercenaries := aGame mercenariesOf: aShip.
+	aMercenaryShip := someMercenaries first.
+	self assert: (aGame indexOfCellWith: aShip) equals: 6.
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 10.
+	self assert: (aGame indexOfCellWith: aMercenaryShip) equals: 1
+]
+
+{ #category : #tests }
+GameTest >> testWhenAShipAndItsMercenaryLosesABattleThenTheyShouldMoveToTheStart [
+
+	| aShip aGame someShips someDice cards cardsToDraw aMercenaryCard anotherShip someMercenaries aMercenaryShip |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence:
+				              #( 1 1 2 2 5 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: MercenaryCard new
+		               with: MercenaryCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+
+	cards := aGame cardsOf: aShip.
+	aMercenaryCard := cards first.
+	aGame playCard: aMercenaryCard by: aShip.
+	aGame throwDice. "turno test-ship-1"
+	aGame throwDice. "turno de test-ship-2"
+
+	someMercenaries := aGame mercenariesOf: aShip.
+	aMercenaryShip := someMercenaries first.
+	self assert: (aGame indexOfCellWith: aShip) equals: 1.
+	self assert: (aGame indexOfCellWith: aMercenaryShip) equals: 1
+]
+
+{ #category : #tests }
 GameTest >> testWhenAShipCompletedTheRequiredLapsThenShouldBeOver [
 
 	| aShip aGame someDice someShips |
@@ -71,7 +367,7 @@ GameTest >> testWhenAShipCompletedTheRequiredLapsThenShouldBeOver [
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 5).
-	aGame playsNextTurn.
+	aGame throwDice.
 	self assert: aGame isOver
 ]
 
@@ -93,9 +389,9 @@ GameTest >> testWhenAShipCompletedThreeLapsNumberOfLapsShouldBeThree [
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
 	self assert: (aGame lapsOf: aShip) equals: 3
 ]
 
@@ -130,9 +426,9 @@ GameTest >> testWhenAShipEntersIntoAMoonwalkCellAndOneShipGoesBackMoreThanTheFir
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
 
 	self deny: aGame isOver
 ]
@@ -169,9 +465,9 @@ GameTest >> testWhenAShipEntersIntoAMoonwalkCellThenItShouldStayInThatCell [
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
 
 	self assert: (aGame indexOfCellWith: yetAnotherShip) equals: 7
 ]
@@ -208,9 +504,9 @@ GameTest >> testWhenAShipEntersIntoAMoonwalkCellWithThreeStepsThenAllTheOtherShi
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
 
 	self assert: (aGame indexOfCellWith: aShip) equals: 1.
 	self assert: (aGame indexOfCellWith: anotherShip) equals: 2
@@ -245,7 +541,7 @@ GameTest >> testWhenAShipEntersToABlackholeCellThenLandsInAnotherBlackholeCellTh
 		         wormholeEnd: 5
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
-	aGame playsNextTurn.
+	aGame throwDice.
 
 	self assert: (aGame indexOfCellWith: aShip) equals: 3
 ]
@@ -267,9 +563,441 @@ GameTest >> testWhenAShipEntersToAWormholeThenItShouldBeOnTheOtherWormhole [
 		         wormholeStart: 4
 		         wormholeEnd: 5
 		         lengthInParsecs: 200.
-	aGame playsNextTurn.
+	aGame throwDice.
 	
 	self assert: (aGame indexOfCellWith: aShip) equals: 5.
+]
+
+{ #category : #tests }
+GameTest >> testWhenAShipLandsInACardGivingCellTheShipShouldHaveOneMoreCard [
+
+	| aShip someShips aGame someDice someCells |
+	aShip := 'test-ship-1'.
+	someShips := OrderedCollection with: aShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 ) asOrderedCollection)).
+	someCells := OrderedCollection new.
+	someCells add: NormalCell new.
+	someCells add: CardGivingCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 3
+		         wormholeEnd: 4
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator cells: someCells).
+	aGame throwDice.
+
+	self assert: (aGame cardsOf: aShip) size equals: 3
+]
+
+{ #category : #tests }
+GameTest >> testWhenAShipPlaysASpeedCardThenTheOtherShipShouldntMoveOneMoreCell [
+
+	| aShip aGame someShips someDice anotherShip aSpeedCard deck cardsToDraw |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 4 4 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: SpeedCard new
+		               with: SpeedCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	deck := aGame cardsOf: aShip.
+	aSpeedCard := deck first.
+	aSpeedCard targetShip: 'test-ship-1'.
+	aGame playCard: aSpeedCard by: aShip.
+	aGame throwDice.
+
+	aGame throwDice.
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 5
+]
+
+{ #category : #tests }
+GameTest >> testWhenAShipPlaysAnAccelerationCardThenAllShipsShouldMoveOneMoreCell [
+
+	| aShip aGame someShips someDice anotherShip deck cardsToDraw yetAnotherShip anAccelerationCard |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	yetAnotherShip := 'test-ship-3'.
+	someShips := OrderedCollection
+		             with: aShip
+		             with: anotherShip
+		             with: yetAnotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 10 20 30 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: AccelerationCard new
+		               with: AccelerationCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 98
+		         wormholeEnd: 99
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	deck := aGame cardsOf: aShip.
+	anAccelerationCard := deck first.
+	aGame playCard: anAccelerationCard by: aShip.
+	aGame throwDice.
+
+	aGame throwDice.
+	aGame throwDice.
+	self assert: (aGame indexOfCellWith: aShip) equals: 12.
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 22.
+	self assert: (aGame indexOfCellWith: yetAnotherShip) equals: 32
+]
+
+{ #category : #tests }
+GameTest >> testWhenAShipPlaysCancellationCardAndCardToRemoveIsSpeedCardAndThereIsNoSpeedCardActiveShouldThrowAnError [
+
+	| aShip aGame someShips someDice anotherShip cardsToDraw aCancellationCard anAccelerationCard aSpeedCard aDeck anotherDeck |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 7 4 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: AccelerationCard new
+		               with: AccelerationCard new
+		               with: CancellationCard new
+		               with: CancellationCard new
+		               with: SpeedCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	aDeck := aGame cardsOf: aShip.
+	anotherDeck := aGame cardsOf: anotherShip.
+	anAccelerationCard := aDeck first.
+	aCancellationCard := anotherDeck first.
+	aSpeedCard := cardsToDraw third.
+	aCancellationCard targetCard: aSpeedCard.
+	aGame playCard: anAccelerationCard by: aShip.
+	aGame throwDice.
+	self
+		should: [ aGame playCard: aCancellationCard by: anotherShip ]
+		raise: Error
+		withMessage: 'no such card in active cards!'
+]
+
+{ #category : #tests }
+GameTest >> testWhenAShipPlaysCancellationCardAndGameHasOneActiveCardThenEffectShouldNotBeAppliedNextTurn [
+
+	| aShip aGame someShips someDice anotherShip aSpeedCard deck cardsToDraw aCancellationCard |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 7 4 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: SpeedCard new
+		               with: CancellationCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	deck := aGame cardsOf: aShip.
+	aSpeedCard := deck first.
+	aCancellationCard := deck second.
+	aSpeedCard targetShip: 'test-ship-2'.
+	aCancellationCard targetCard: aSpeedCard.
+	aGame playCard: aSpeedCard by: aShip.
+	aGame throwDice.
+	aGame playCard: aCancellationCard by: anotherShip.
+	aGame throwDice.
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 5
+]
+
+{ #category : #tests }
+GameTest >> testWhenAShipPlaysCancellationCardAndThereAreZeroActiveCardsShouldThrowAnError [
+
+	| aShip aGame someShips someDice anotherShip aSpeedCard deck cardsToDraw aCancellationCard |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 7 4 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: SpeedCard new
+		               with: CancellationCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	deck := aGame cardsOf: aShip.
+	aSpeedCard := deck first.
+	aCancellationCard := deck second.
+	aSpeedCard targetShip: 'test-ship-2'.
+	aCancellationCard targetCard: aSpeedCard.
+	aGame throwDice.
+	self
+		should: [ aGame playCard: aCancellationCard by: anotherShip ]
+		raise: Error
+		withMessage: 'no such card in active cards!'
+]
+
+{ #category : #tests }
+GameTest >> testWhenAShipUsesAMercenaryCardAndTheMercenaryAndAnotherShipLandsInTheSameCellThenTheyShouldBattle [
+
+	| aShip aGame someShips someDice cards cardsToDraw aMercenaryCard anotherShip |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 2 2 2 4 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: MercenaryCard new
+		               with: MercenaryCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	cards := aGame cardsOf: aShip.
+	aMercenaryCard := cards first.
+	aGame playCard: aMercenaryCard by: aShip.
+	aGame throwDice. "turno test-ship-1"
+	aGame throwDice. "turno test-ship-2"
+	aGame throwDice. "turno de mercenaria"
+
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 1
+]
+
+{ #category : #tests }
+GameTest >> testWhenAShipUsesAMercenaryCardAndTheMercenaryAndThatShipLandsInTheSameCellThenTheyShouldNotBattle [
+
+	| aShip aGame someShips someDice cards cardsToDraw aMercenaryCard |
+	aShip := 'test-ship-1'.
+	someShips := OrderedCollection with: aShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 1 1 10 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: MercenaryCard new
+		               with: MercenaryCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	cards := aGame cardsOf: aShip.
+	aMercenaryCard := cards first.
+	aGame playCard: aMercenaryCard by: aShip.
+	aGame throwDice. "turno test-ship-1"
+	aGame throwDice. "turno de mercenaria"
+
+	self assert: (aGame indexOfCellWith: aShip) equals: 2
+]
+
+{ #category : #tests }
+GameTest >> testWhenAShipUsesAMercenaryCardAndThenAnotherShipCancellsThatMercenaryThenShouldRemoveIt [
+
+	| aShip aGame someShips someDice cardsToDraw aMercenaryCard anotherShip aShipCards anotherShipCards aCancellationCard someMercenaries |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 1 1 10 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: MercenaryCard new
+		               with: MercenaryCard new
+		               with: CancellationCard new
+		               with: CancellationCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	aShipCards := aGame cardsOf: aShip.
+	anotherShipCards := aGame cardsOf: anotherShip.
+
+	aMercenaryCard := aShipCards first.
+	aCancellationCard := anotherShipCards first.
+
+
+
+	aCancellationCard targetCard: aMercenaryCard.
+
+	aGame playCard: aMercenaryCard by: aShip.
+	aGame playCard: aCancellationCard by: anotherShip.
+
+	someMercenaries := aGame mercenariesOf: aShip.
+	self assert: someMercenaries size equals: 0
+]
+
+{ #category : #tests }
+GameTest >> testWhenAShipUsesAMercenaryCardAndThenBattleWithAnotherShipThenTheMercenaryShouldHelp [
+
+	| aShip aGame someShips someDice cards cardsToDraw aMercenaryCard anotherShip |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence:
+				              #( 1 1 4 2 5 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: MercenaryCard new
+		               with: MercenaryCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	cards := aGame cardsOf: aShip.
+	aMercenaryCard := cards first.
+	aGame playCard: aMercenaryCard by: aShip.
+	aGame throwDice. "turno test-ship-1"
+	aGame throwDice. "turno de test-ship-2"
+
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 1.
+	self assert: (aGame indexOfCellWith: aShip) equals: 2
+]
+
+{ #category : #tests }
+GameTest >> testWhenBothShipsHaveAMercenaryThenBothShouldHelpInTheBattle [
+
+	| aShip aGame someShips someDice cardsToDraw aMercenaryCard anotherShip someMercenaries aMercenaryShip someCards someOtherCards anotherMercenaryCard |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence:
+				              #( 3 3 2 2 2 3 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: MercenaryCard new
+		               with: MercenaryCard new
+		               with: MercenaryCard new
+		               with: MercenaryCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 4
+		         wormholeEnd: 5
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+
+	someCards := aGame cardsOf: aShip.
+	aMercenaryCard := someCards first.
+
+	someOtherCards := aGame cardsOf: anotherShip.
+	anotherMercenaryCard := someOtherCards first.
+	"turno test-ship-1"
+	aGame playCard: aMercenaryCard by: aShip.
+	aGame throwDice.
+	"turno de test-ship-2"
+	aGame playCard: anotherMercenaryCard by: anotherShip.
+	aGame throwDice.
+
+
+
+	someMercenaries := aGame mercenariesOf: aShip.
+	aMercenaryShip := someMercenaries first.
+	self assert: (aGame indexOfCellWith: aShip) equals: 1.
+	self assert: (aGame indexOfCellWith: aMercenaryShip) equals: 1
+]
+
+{ #category : #tests }
+GameTest >> testWhenGameIsEndedAndTryToUseACardThenShouldThrowError [
+
+	| aShip aGame someShips someDice anotherShip aSpeedCard deck cardsToDraw |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 20 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: SpeedCard new
+		               with: SpeedCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	aGame throwDice.
+
+	deck := aGame cardsOf: anotherShip.
+	aSpeedCard := deck first.
+	aSpeedCard targetShip: anotherShip.
+	self
+		should: [ aGame playCard: aSpeedCard by: anotherShip ]
+		raise: Error
+		withMessage: 'game is over!'
 ]
 
 { #category : #tests }
@@ -295,9 +1023,9 @@ GameTest >> testWhenGameIsOverThenTheRankingShouldShowTheCorrectOrderOfShips [
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
 	self assert: aGame ranking equals: {
 			aShip.
 			anotherShip.
@@ -323,10 +1051,112 @@ GameTest >> testWhenHasTwoLapsAndAShipCompletedTwoLapsShouldBeOver [
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 5).
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
 	self assert: aGame isOver
+]
+
+{ #category : #tests }
+GameTest >> testWhenLastEffectWasBlackHoleAndUseTheRepeatCardThenShouldGoBackFourCells [
+
+	| aShip someShips aGame someDice someCells cardsToDraw aRepeatCard |
+	aShip := 'test-ship-1'.
+	someShips := OrderedCollection with: aShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 8 ) asOrderedCollection)).
+	someCells := OrderedCollection new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: BlackholeCell new.
+	someCells add: NormalCell new.
+
+	cardsToDraw := OrderedCollection
+		               with: RepeatCard new
+		               with: RepeatCard new.
+
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: someCells size
+		         wormholeStart: 5
+		         wormholeEnd: 6
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator cells: someCells)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	aRepeatCard := (aGame cardsOf: aShip) first.
+	aRepeatCard targetShip: aShip.
+	aGame throwDice.
+	aGame playCard: aRepeatCard by: aShip.
+
+	self assert: (aGame indexOfCellWith: aShip) equals: 1
+]
+
+{ #category : #tests }
+GameTest >> testWhenLastEffectWasMoonwalkCellAndUseTheRepeatCardThenAllShipsExceptFirstShipShouldGoBackOneCell [
+
+	| aShip someShips aGame someDice someCells cardsToDraw aRepeatCard anotherShip yetAnotherShip |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	yetAnotherShip := 'test-ship-3'.
+	someShips := OrderedCollection
+		             with: aShip
+		             with: anotherShip
+		             with: yetAnotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 11 2 8 ) asOrderedCollection)).
+	someCells := OrderedCollection new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: (MoonwalkCell times: 1).
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+
+	cardsToDraw := OrderedCollection
+		               with: RepeatCard new
+		               with: RepeatCard new
+		               with: RepeatCard new
+		               with: RepeatCard new
+		               with: RepeatCard new
+		               with: RepeatCard new.
+
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: someCells size
+		         wormholeStart: 12
+		         wormholeEnd: 13
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator cells: someCells)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	aRepeatCard := (aGame cardsOf: yetAnotherShip) first.
+	aRepeatCard targetShip: aShip.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice. "cae en MoonWalk"
+	aGame playCard: aRepeatCard by: yetAnotherShip.
+
+	self assert: (aGame indexOfCellWith: aShip) equals: 12.
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 1.
+	self assert: (aGame indexOfCellWith: yetAnotherShip) equals: 8
 ]
 
 { #category : #tests }
@@ -347,8 +1177,125 @@ GameTest >> testWhenNoShipCompletedTheLapsThenGameShouldNotBeOver [
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 4).
-	aGame playsNextTurn.
+	aGame throwDice.
 	self deny: aGame isOver
+]
+
+{ #category : #tests }
+GameTest >> testWhenPlayAAccelerationCardAndThenARedoCardThenShouldApplyTheAcelerationEffectTwice [
+
+	| aShip aGame someShips someDice anotherShip deck cardsToDraw anAccelerationCard aRedoCard |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 4 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: AccelerationCard new
+		               with: RedoCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	deck := aGame cardsOf: aShip.
+	anAccelerationCard := deck first.
+	aRedoCard := deck second.
+	aGame playCard: anAccelerationCard by: aShip.
+	aGame playCard: aRedoCard by: aShip.
+	aGame throwDice.
+
+	self assert: (aGame indexOfCellWith: aShip) equals: 7
+]
+
+{ #category : #tests }
+GameTest >> testWhenPlaysASpeedCardThenPlaysARedoCardThenPlaysAnotherRedoCardShouldMoveThreeMoreCells [
+
+    | aShip aGame someShips someDice aSpeedCard someCardsToDraw someCells anotherCardsToDraw cards aRedoCard anotherRedoCard |
+    aShip := 'test-ship-1'.
+    someShips := OrderedCollection with: aShip.
+    someDice := Dice withAll:
+                    (Set with:
+                         (LoadedDie sequence: #( 1 1 ) asOrderedCollection)).
+    someCardsToDraw := OrderedCollection
+                           with: SpeedCard new
+                           with: RedoCard new.
+    anotherCardsToDraw := OrderedCollection with: RedoCard new.
+    someCells := OrderedCollection new.
+    someCells
+        add: NormalCell new;
+        add: (CardGivingCell deck: (LoadedDeck cards: anotherCardsToDraw));
+        add: NormalCell new;
+        add: NormalCell new;
+        add: NormalCell new;
+        add: NormalCell new;
+        add: NormalCell new;
+        add: NormalCell new;
+        add: NormalCell new;
+        add: NormalCell new.
+
+    aGame := SpaceshipGame
+                 with: someShips
+                 lapsToWin: 2
+                 using: someDice
+                 withCells: someCells size
+                 wormholeStart: 8
+                 wormholeEnd: 9
+                 lengthInParsecs: 100
+                 cellGenerator: (FixedCellGenerator cells: someCells)
+                 deck: (LoadedDeck cards: someCardsToDraw).
+
+    aGame throwDice.
+    cards := aGame cardsOf: aShip.
+    aSpeedCard := cards first.
+    aRedoCard := cards second.
+    anotherRedoCard := cards third.
+    aSpeedCard targetShip: aShip.
+    aRedoCard targetShip: aShip.
+    anotherRedoCard targetShip: aShip.
+
+    aGame playCard: aSpeedCard by: aShip.
+    aGame playCard: aRedoCard by: aShip.
+    aGame playCard: anotherRedoCard by: aShip.
+    aGame throwDice.
+    self assert: (aGame indexOfCellWith: aShip) equals: 6
+]
+
+{ #category : #tests }
+GameTest >> testWhenPlaysASpeedCardThenShouldMoveOneMoreCell [
+
+	| aShip aGame someShips someDice anotherShip aSpeedCard deck cardsToDraw |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 4 4 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: SpeedCard new
+		               with: SpeedCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	deck := aGame cardsOf: aShip.
+	aSpeedCard := deck first.
+	aSpeedCard targetShip: 'test-ship-1'.
+	aGame playCard: aSpeedCard by: aShip.
+	aGame throwDice.
+	self assert: (aGame indexOfCellWith: aShip) equals: 6
 ]
 
 { #category : #tests }
@@ -379,17 +1326,17 @@ GameTest >> testWhenSecondShipsLosesTwoShieldsAndThenAnotherShieldDueToAtomicBom
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
 	"Loser Turn"
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 	"Loser Turn"
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 	
 	self assert: (aGame indexOfCellWith: aShip) equals: 3.
 	self assert: (aGame indexOfCellWith: anotherShip) equals: 1
@@ -408,8 +1355,10 @@ GameTest >> testWhenShipEntersManyTimesToAHyperjumpCellThenShouldMoveAccordingTo
 
 	someCells add: NormalCell new.
 	someCells add: NormalCell new.
-	someCells add:
-		(HyperJumpCell withParsecs: #( 2 10 20 ) asOrderedCollection).
+	someCells add: (HyperJumpCell withLengths: {
+				 2 parsecs.
+				 10 parsecs.
+				 20 parsecs } asOrderedCollection).
 	someCells add: NormalCell new.
 	someCells add: NormalCell new.
 	someCells add: NormalCell new.
@@ -455,13 +1404,13 @@ GameTest >> testWhenShipEntersToABlackholeCellThenShouldGoBackFourCells [
 		         wormholeEnd: 6
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
-	aGame playsNextTurn.
+	aGame throwDice.
 
 	self assert: (aGame indexOfCellWith: aShip) equals: 3
 ]
 
 { #category : #tests }
-GameTest >> testWhenShipEntersToAHyperJumpCellThenShouldMoveTheDesiredAmountOfParsecs [
+GameTest >> testWhenShipEntersToAHyperJumpCellThenShouldMoveTheDesiredAmountOfLightyears [
 
 	| aShip someShips aGame someDice someCells |
 	aShip := 'test-ship-1'.
@@ -473,7 +1422,7 @@ GameTest >> testWhenShipEntersToAHyperJumpCellThenShouldMoveTheDesiredAmountOfPa
 	someCells add: NormalCell new.
 	someCells add: NormalCell new.
 	someCells add:
-		(HyperJumpCell withParsecs: #( 10 ) asOrderedCollection).
+		(HyperJumpCell withLengths: { 60 lightYears } asOrderedCollection).
 	someCells add: NormalCell new.
 	someCells add: NormalCell new.
 	someCells add: NormalCell new.
@@ -491,7 +1440,43 @@ GameTest >> testWhenShipEntersToAHyperJumpCellThenShouldMoveTheDesiredAmountOfPa
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 
-	aGame playsNextTurn.
+	aGame throwDice.
+
+	self assert: (aGame indexOfCellWith: aShip) equals: 5
+]
+
+{ #category : #tests }
+GameTest >> testWhenShipEntersToAHyperJumpCellThenShouldMoveTheDesiredAmountOfParsecs [
+
+	| aShip someShips aGame someDice someCells |
+	aShip := 'test-ship-1'.
+	someShips := OrderedCollection with: aShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 2 ) asOrderedCollection)).
+	someCells := OrderedCollection new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add:
+		(HyperJumpCell withLengths: { 10 parsecs } asOrderedCollection).
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: someCells size
+		         wormholeStart: 5
+		         wormholeEnd: 6
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator cells: someCells).
+
+	aGame throwDice.
 
 	self assert: (aGame indexOfCellWith: aShip) equals: 4
 ]
@@ -526,16 +1511,16 @@ GameTest >> testWhenShipEntersToAHyperSpaceJumpCellAndThatShipLosesTwoTimesShoul
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
 
 	self assert: (aGame indexOfCellWith: anotherShip) equals: 10.
 	self assert: (aGame indexOfCellWith: aShip) equals: 1
@@ -568,7 +1553,7 @@ GameTest >> testWhenShipEntersToAHyperSpaceJumpCellThenShouldGoForwardFourCells 
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
-	aGame playsNextTurn.
+	aGame throwDice.
 
 	self assert: (aGame indexOfCellWith: aShip) equals: 6
 ]
@@ -610,11 +1595,11 @@ GameTest >> testWhenShipEntersToAHyperSpaceJumpCellThreeTimesInARowItShouldLoseT
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
 
 	self deny: aGame isOver.
 	self assert: (aGame indexOfCellWith: aShip) equals: 16
@@ -633,7 +1618,7 @@ GameTest >> testWhenShipEntersToAHyperjumpCellAndParsecIsNotEnoughToMoveOneCellT
 	someCells add: NormalCell new.
 	someCells add: NormalCell new.
 	someCells add:
-		(HyperJumpCell withParsecs: #( 5 ) asOrderedCollection).
+		(HyperJumpCell withLengths: { 5 parsecs } asOrderedCollection).
 	someCells add: NormalCell new.
 	someCells add: NormalCell new.
 	someCells add: NormalCell new.
@@ -650,8 +1635,8 @@ GameTest >> testWhenShipEntersToAHyperjumpCellAndParsecIsNotEnoughToMoveOneCellT
 		         wormholeEnd: 5
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
-		
-	aGame playsNextTurn.
+
+	aGame throwDice.
 
 	self assert: (aGame indexOfCellWith: aShip) equals: 3
 ]
@@ -684,9 +1669,9 @@ GameTest >> testWhenShipEntersToAnAtomicBombCellAllShipsShouldGoBackToTheBeginni
 		         wormholeEnd: 5
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
 
 	self assert: (aGame indexOfCellWith: yetAnotherShip) equals: 1.
 	self assert: (aGame indexOfCellWith: anotherShip) equals: 1.
@@ -732,9 +1717,9 @@ GameTest >> testWhenShipIsInLastCellThenPlaysNextTurnShouldThrowError [
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
-	aGame playsNextTurn.
+	aGame throwDice.
 	self
-		should: [ aGame playsNextTurn ]
+		should: [ aGame throwDice ]
 		raise: Error
 		withMessage: 'game is over!'
 ]
@@ -757,7 +1742,7 @@ GameTest >> testWhenShipIsInLastCellThenTheIndexOfThatCellShouldBeTheLastIndex [
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
-	aGame playsNextTurn.
+	aGame throwDice.
 	self assert: (aGame indexOfCellWith: aShip) equals: 10
 ]
 
@@ -780,20 +1765,20 @@ GameTest >> testWhenShipLosesTwoBattlesThenSkipsATurnThenLoseAnotherBattleThenIt
 		         wormholeEnd: 10
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
-	aGame playsNextTurn. "+1"
-	aGame playsNextTurn. "pierde shield"
+	aGame throwDice. "+1"
+	aGame throwDice. "pierde shield"
 
-	aGame playsNextTurn. "+1"
-	aGame playsNextTurn. "pierde shield"
+	aGame throwDice. "+1"
+	aGame throwDice. "pierde shield"
 
-	aGame playsNextTurn. "+1"
+	aGame throwDice. "+1"
 	aGame skipsNextTurn. "recupera los shields"
 
-	aGame playsNextTurn. "+1"
-	aGame playsNextTurn. "1" "pierde shield"
+	aGame throwDice. "+1"
+	aGame throwDice. "1" "pierde shield"
 
-	aGame playsNextTurn. "+1"
-	aGame playsNextTurn. "+1"
+	aGame throwDice. "+1"
+	aGame throwDice. "+1"
 
 	self assert: (aGame indexOfCellWith: anotherShip) equals: 2
 ]
@@ -817,17 +1802,17 @@ GameTest >> testWhenShipRunsOutOfShieldsThenShouldLoseTwoTurns [
 		         wormholeEnd: 10
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
 	self assert: (aGame indexOfCellWith: anotherShip) equals: 1
 ]
@@ -851,20 +1836,20 @@ GameTest >> testWhenShipRunsOutOfShieldsThenTheOtherShipMoves [
 		         wormholeEnd: 10
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 20).
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
 	self assert: (aGame indexOfCellWith: aShip) equals: 12
 ]
@@ -888,23 +1873,23 @@ GameTest >> testWhenShipRunsOutOfShieldsThenTwoTurnsLaterCanPlay [
 		         wormholeEnd: 10
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
 
 
@@ -930,8 +1915,8 @@ GameTest >> testWhenShipsEntersToAWormholeAndThereIsAnotherShipInTheOtherWormhol
 		         wormholeEnd: 5
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 	
 	self assert: (aGame indexOfCellWith: anotherShip) equals: 1.
 ]
@@ -955,7 +1940,7 @@ GameTest >> testWhenTheFirstShipCompletedTheRequiredLapsThenShouldBeTheWinner [
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
-	aGame playsNextTurn.
+	aGame throwDice.
 	self assert: aGame winner equals: aShip
 ]
 
@@ -994,10 +1979,10 @@ GameTest >> testWhenThirdShipEntersToAnAtomicBombCellAndThenFirstShipRollsNineIn
 		         wormholeEnd: 4
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
 
 	self assert: aGame isOver.
 	self assert: (aGame indexOfCellWith: yetAnotherShip) equals: 1.
@@ -1025,8 +2010,8 @@ GameTest >> testWhenTwoShipsBattleAndItsADrawTheSecondShipGoesBackToFirstCell [
 		         wormholeEnd: 10
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
 	self assert: (aGame indexOfCellWith: anotherShip) equals: 1
 ]
@@ -1050,8 +2035,162 @@ GameTest >> testWhenTwoShipsBattleAndTheFirstShipWinsTheSecondShipGoesBackToFirs
 		         wormholeEnd: 10
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
-	aGame playsNextTurn.
-	aGame playsNextTurn.
+	aGame throwDice.
+	aGame throwDice.
 
 	self assert: (aGame indexOfCellWith: anotherShip) equals: 1
+]
+
+{ #category : #tests }
+GameTest >> testWhenTwoShipsEnterToAHyperJumpCellThenShouldMoveTheDesiredAmountOfParsecsOrLightyears [
+
+	| aShip someShips aGame someDice someCells anotherShip |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 2 ) asOrderedCollection)).
+	someCells := OrderedCollection new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: (HyperJumpCell withLengths: {
+				 10 parsecs.
+				 90 lightYears } asOrderedCollection).
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	someCells add: NormalCell new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: someCells size
+		         wormholeStart: 5
+		         wormholeEnd: 6
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator cells: someCells).
+
+	aGame throwDice.
+	aGame throwDice.
+	self assert: (aGame indexOfCellWith: aShip) equals: 4.
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 6
+]
+
+{ #category : #tests }
+GameTest >> testWhenTwoShipsHaveMercenariesAndCancelOneThenTheOtherShouldKeepHavingOne [
+
+	| aShip aGame someShips someDice cardsToDraw aMercenaryCard anotherShip aShipCards anotherShipCards aCancellationCard someMercenaries anotherMercenaryCard someOtherMercenaries |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 1 1 10 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: MercenaryCard new
+		               with: MercenaryCard new
+		               with: MercenaryCard new
+		               with: CancellationCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	aShipCards := aGame cardsOf: aShip.
+	anotherShipCards := aGame cardsOf: anotherShip.
+
+	aMercenaryCard := aShipCards first.
+
+	anotherMercenaryCard := anotherShipCards first.
+	aCancellationCard := anotherShipCards second.
+
+	aCancellationCard targetCard: aMercenaryCard.
+
+	aGame playCard: aMercenaryCard by: aShip.
+	aGame throwDice.
+	aGame playCard: anotherMercenaryCard by: anotherShip.
+	aGame playCard: aCancellationCard by: anotherShip.
+
+	someMercenaries := aGame mercenariesOf: aShip.
+	someOtherMercenaries := aGame mercenariesOf: anotherShip.
+	
+	self assert: someMercenaries size equals: 0.
+	self assert: someOtherMercenaries size equals: 1
+]
+
+{ #category : #tests }
+GameTest >> testWhenUsesARedoCardAfterAPermanentCardAndItsNotTheShipTurnShouldThrowError [
+
+	| aShip aGame someShips someDice aSpeedCard someCardsToDraw anotherCardsToDraw cards aRedoCard anotherShip |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 1 ) asOrderedCollection)).
+	someCardsToDraw := OrderedCollection
+		                   with: SpeedCard new
+		                   with: RedoCard new
+		                   with: SpeedCard new
+		                   with: RedoCard new.
+	anotherCardsToDraw := OrderedCollection with: RedoCard new.
+
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 100
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
+		         deck: (LoadedDeck cards: someCardsToDraw).
+	cards := aGame cardsOf: aShip.
+	aSpeedCard := cards first.
+	aRedoCard := cards second.
+	aSpeedCard targetShip: aShip.
+	aRedoCard targetShip: aShip.
+
+	aGame playCard: aSpeedCard by: aShip.
+	aGame throwDice. "turno test-ship-1"
+	self
+		should: [ aGame playCard: aRedoCard by: aShip ]
+		raise: Error
+		withMessage: 'it is not your turn!'
+]
+
+{ #category : #tests }
+GameTest >> testWhenUsingACardThatsNotInTheShipDeckThenShouldRaiseError [
+
+	| aShip someShips aGame someDice anotherShip aSpeedCard |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 6 ) asOrderedCollection)).
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 2
+		         wormholeEnd: 3
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
+	aSpeedCard := SpeedCard new.
+	aSpeedCard targetShip: aShip.
+	self
+		should: [ aGame playCard: aSpeedCard by: aShip ]
+		raise: Error
+		withMessage: 'that card is not in deck'
 ]

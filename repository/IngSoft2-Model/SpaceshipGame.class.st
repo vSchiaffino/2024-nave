@@ -111,9 +111,9 @@ SpaceshipGame >> initializeWith: someShipNames lapsToWin: aNumberOfLapsToWin usi
 	activeCards := OrderedCollection new.
 	dice := someDice.
 	ships := someShipNames collect: [ :eachShipName |
-		         PlayerShip
+		         Ship
 			         named: eachShipName
-			         deck:
+			         cards:
 			         (OrderedCollection with: deck drawCard with: deck drawCard) ].
 	board := Board
 		         withShips: ships
@@ -138,14 +138,6 @@ SpaceshipGame >> lapsOf: aShipName [
 ]
 
 { #category : #'as yet unclassified' }
-SpaceshipGame >> mercenariesOf: aShipName [
-
-	| aShip |
-	aShip := self shipNamed: aShipName.
-	^ aShip allies collect: [ :eachAlly | eachAlly name ]
-]
-
-{ #category : #'as yet unclassified' }
 SpaceshipGame >> playCard: aCard by: aShipName [
 
 	| aShip isShipTurn shipToPlay |
@@ -154,7 +146,7 @@ SpaceshipGame >> playCard: aCard by: aShipName [
 	shipToPlay := ships first.
 	isShipTurn := aShip = shipToPlay.
 	aCard lastCardWas: lastUsedCard.
-	aCard verifyCanBeUsed: isShipTurn.
+	aCard verifyCanBeUsed: isShipTurn withActiveCards: activeCards.
 	aShip
 		useCard: aCard
 		in: board
@@ -208,7 +200,8 @@ SpaceshipGame >> throwDice [
 					             ifTrue: [ collidingShip ]
 					             ifFalse: [ actualShip ].
 				loserShip removeShield.
-				board moveToTheStart: loserShip ] ] ].
+				board moveToTheStart: loserShip.
+				loserShip allies do: [ :eachAlly | board moveToTheStart: eachAlly ] ] ] ].
 
 	ships removeFirst.
 	ships addLast: shipToPlay

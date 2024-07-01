@@ -5,7 +5,7 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-PermanentCard >> verifyCanBeUsed: isMyTurn [
+PermanentCard >> verifyCanBeUsed: isMyTurn withActiveCards: someActiveCards [
 
-	isMyTurn ifFalse: [ Error signal: 'it is not your turn!' ]
+	isMyTurn ifFalse: [ Error signal: 'it is not your turn!' ].
 ]

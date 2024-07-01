@@ -9,7 +9,14 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-Card >> beRemovedWith: someShips [
+Card >> beRemovedWithShips: someShips [
+
+]
+
+{ #category : #'as yet unclassified' }
+Card >> hasSameMercenary: someActiveCards [
+
+	^ false
 ]
 
 { #category : #'as yet unclassified' }
@@ -43,7 +50,7 @@ Card >> useIn: aBoard withActiveCards: someActiveCards withShips: someShips [
 ]
 
 { #category : #'as yet unclassified' }
-Card >> verifyCanBeUsed: isMyTurn [
+Card >> verifyCanBeUsed: isMyTurn withActiveCards: someActiveCards [
 
 	self subclassResponsibility
 ]

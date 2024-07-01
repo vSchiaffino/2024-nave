@@ -153,12 +153,6 @@ Board >> parsecsPerCell [
 	^ lengthInParsecs // cells size
 ]
 
-{ #category : #'as yet unclassified' }
-Board >> placeAtTheStart: aShip [
-
-	cells first enters: aShip
-]
-
 { #category : #accessing }
 Board >> rank: aShip [
 

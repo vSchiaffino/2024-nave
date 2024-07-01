@@ -9,3 +9,7 @@ RepeatCard >> useIn: aBoard withActiveCards: someActiveCards withShips: someShip
 
 	aBoard applyLastEffectTo: targetShipName
 ]
+
+{ #category : #'as yet unclassified' }
+RepeatCard >> verifyCanBeUsed: isMyTurn withActiveCards: someActiveCards [
+]

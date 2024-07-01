@@ -31,7 +31,9 @@ RedoCard >> useIn: aBoard withActiveCards: someActiveCards withShips: someShips 
 ]
 
 { #category : #'as yet unclassified' }
-RedoCard >> verifyCanBeUsed: isMyTurn [
+RedoCard >> verifyCanBeUsed: isMyTurn withActiveCards: someActiveCards [
 
-	lastUsedCard verifyCanBeUsed: isMyTurn
+	lastUsedCard
+		verifyCanBeUsed: isMyTurn
+		withActiveCards: someActiveCards
 ]

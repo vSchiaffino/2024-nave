@@ -8,10 +8,12 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-MercenaryCard >> beRemovedWith: someShips [
+MercenaryCard >> beRemovedWithShips: someShips [
 
-	myMercenaryShip beRemoved.
-	someShips remove: myMercenaryShip
+	| targetShip |
+	targetShip := someShips detect: [ :eachShip |
+		              eachShip name = targetShipName ].
+	someShips do: [ :eachShip | eachShip removeAlly: targetShip ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -21,18 +23,27 @@ MercenaryCard >> diceModifierTo: aShip [
 ]
 
 { #category : #'as yet unclassified' }
+MercenaryCard >> hasSameMercenary: aShipName [
+
+	^ aShipName = targetShipName
+]
+
+{ #category : #'as yet unclassified' }
 MercenaryCard >> useIn: aBoard withActiveCards: someActiveCards withShips: someShips [
 
-	| aMercenaryName aMercenaryShip cardUser |
+	| cardUser targetShip |
 	cardUser := someShips first.
 	someActiveCards add: self.
-	aMercenaryName := 'mercenary-of-' , cardUser name , '-'
-	                  , 10000 atRandom printString.
-	aMercenaryShip := MercenaryShip named: aMercenaryName.
-	aMercenaryShip addAlly: cardUser.
-	cardUser addAlly: aMercenaryShip.
 
-	myMercenaryShip := aMercenaryShip.
-	someShips add: aMercenaryShip.
-	aBoard placeAtTheStart: aMercenaryShip
+	targetShip := someShips detect: [ :eachShip |
+		              eachShip name = targetShipName ].
+	cardUser addAlly: targetShip
+]
+
+{ #category : #'as yet unclassified' }
+MercenaryCard >> verifyCanBeUsed: isMyTurn withActiveCards: someActiveCards [
+
+	super verifyCanBeUsed: isMyTurn withActiveCards: someActiveCards.
+	(someActiveCards anySatisfy: [ :eachCard |
+		eachCard hasSameMercenary: targetShipName ]) ifTrue: [ Error signal: 'that ship is already a mercenary!' ]
 ]

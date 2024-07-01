@@ -33,7 +33,11 @@ RedoCard >> useIn: aBoard withActiveCards: someActiveCards withShips: someShips 
 { #category : #'as yet unclassified' }
 RedoCard >> verifyCanBeUsed: isMyTurn withActiveCards: someActiveCards [
 
-	lastUsedCard
+	| newCardToUse |
+	newCardToUse := lastUsedCard copy.
+	newCardToUse targetShip: targetShipName.
+	newCardToUse targetCard: targetCard.
+	newCardToUse
 		verifyCanBeUsed: isMyTurn
 		withActiveCards: someActiveCards
 ]

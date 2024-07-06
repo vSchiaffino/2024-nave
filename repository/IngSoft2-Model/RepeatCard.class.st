@@ -1,15 +1,11 @@
 Class {
 	#name : #RepeatCard,
-	#superclass : #InstantCard,
+	#superclass : #Card,
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #'as yet unclassified' }
-RepeatCard >> useIn: aBoard withActiveCards: someActiveCards withShips: someShips [
+{ #category : #'card effect' }
+RepeatCard >> useWith: aCardManager target: aTargetShip [
 
-	aBoard applyLastEffectTo: targetShipName
-]
-
-{ #category : #'as yet unclassified' }
-RepeatCard >> verifyCanBeUsed: isMyTurn withActiveCards: someActiveCards [
+	aCardManager repeatLastCellEffectTo: aTargetShip
 ]

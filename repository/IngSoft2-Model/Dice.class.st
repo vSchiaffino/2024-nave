@@ -7,7 +7,7 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #'instance creation' }
+{ #category : #'as yet unclassified' }
 Dice class >> withAll: someDice [
 
 	^ self new initializeWith: someDice
@@ -19,7 +19,7 @@ Dice >> initializeWith: someDice [
 	dice := someDice
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'dice logic' }
 Dice >> throw [
 
 	^ (dice collect: [ :eachDie | eachDie throw ]) sum

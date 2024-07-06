@@ -14,7 +14,7 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'instance creation' }
 Board class >> withShips: someShips lengthInParsecs: anAmountOfLengthInParsecs lapsToWin: aNumberOfLapsToWin wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation cellGenerator: aCellGenerator [
 
 	^ self new
@@ -26,20 +26,20 @@ Board class >> withShips: someShips lengthInParsecs: anAmountOfLengthInParsecs l
 		  cellGenerator: aCellGenerator
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 Board >> allShips [
 
 	^ lapsPerShip keys asSet
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'helper methods' }
 Board >> anyShipCompletedAllLaps [
 
 	^ lapsPerShip anySatisfy: [ :lapsByEachShip |
 		  lapsByEachShip >= lapsToWin ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'cell effect' }
 Board >> applyEffectTo: aShip [
 
 	| aCell |
@@ -48,7 +48,7 @@ Board >> applyEffectTo: aShip [
 	aCell applyEffectTo: aShip in: self
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'cell effect' }
 Board >> applyLastEffectTo: aShipName [
 
 	| aShip |
@@ -56,12 +56,12 @@ Board >> applyLastEffectTo: aShipName [
 	lastCellEffectUsed applyEffectTo: aShip in: self
 ]
 
-{ #category : #'as yet unclassified' }
-Board >> if: aShip isCollidding: aBlockIfColliding [
+{ #category : #'helper methods' }
+Board >> checkIf: shipToPlay IsCollidingIn: aGame [
 
 	| aCell |
-	aCell := self whereIs: aShip.
-	aCell ifHasTwoShips: aBlockIfColliding
+	aCell := self whereIs: shipToPlay.
+	aCell checkCollisionIn: aGame
 ]
 
 { #category : #accessing }
@@ -73,6 +73,8 @@ Board >> indexOfCellWith: aShip [
 { #category : #initialization }
 Board >> initializeWith: someShips lengthInParsecs: aLengthInParsecs lapsToWin: aNumberOfLapsToWin wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation cellGenerator: aCellGenerator [
 
+	aWormholeStartLocation = aWormholeEndLocation ifTrue: [
+		Error signal: 'wormhole cannot start and end in the same cell!' ].
 	lastCellEffectUsed := NormalCell new.
 	lengthInParsecs := aLengthInParsecs.
 	lapsToWin := aNumberOfLapsToWin.
@@ -89,12 +91,12 @@ Board >> initializeWith: someShips lengthInParsecs: aLengthInParsecs lapsToWin: 
 	^ self
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 Board >> lapsOf: aShip [ 
 	^ lapsPerShip at: aShip.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #movement }
 Board >> move: aShip by: anAmount [
 
 	| actualCell nextCell actualCellIndex nextCellIndex actualShipLaps lapsChangeAmount cellsToMove |
@@ -103,18 +105,16 @@ Board >> move: aShip by: anAmount [
 	actualCell := self whereIs: aShip.
 	actualCellIndex := cells indexOf: actualCell.
 	nextCellIndex := actualCellIndex - 1 + cellsToMove % cells size + 1.
-
-	aShip updateLapsIfRequired: [
-		actualShipLaps := lapsPerShip at: aShip.
-		lapsChangeAmount := actualCellIndex - 1 + cellsToMove // cells size.
-		lapsPerShip at: aShip put: actualShipLaps + lapsChangeAmount ].
+	actualShipLaps := lapsPerShip at: aShip.
+	lapsChangeAmount := actualCellIndex - 1 + cellsToMove // cells size.
+	lapsPerShip at: aShip put: actualShipLaps + lapsChangeAmount.
 
 	nextCell := cells at: nextCellIndex.
 	actualCell leaves: aShip.
 	nextCell enters: aShip
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #movement }
 Board >> moveAllShips: times except: aShip [
 
 	| allShips |
@@ -123,13 +123,13 @@ Board >> moveAllShips: times except: aShip [
 	allShips do: [ :eachShip | self move: eachShip by: times ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #movement }
 Board >> moveAllShipsToTheStart [
 
 	self allShips do: [ :eachShip | self moveToTheStart: eachShip ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #movement }
 Board >> moveToTheStart: aShip [
 
 	| actualCell |
@@ -147,7 +147,7 @@ Board >> orderedShips [
 	^ (self allShips sorted: sortByRankBlock) asOrderedCollection
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 Board >> parsecsPerCell [
 
 	^ lengthInParsecs // cells size
@@ -168,14 +168,14 @@ Board >> removeShieldFromAllShips [
 	self allShips do: [ :eachShip | eachShip removeShield ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 Board >> shipWithCompletedLaps [
 
 	^ lapsPerShip keys detect: [ :eachShip |
 		  (lapsPerShip at: eachShip) >= lapsToWin ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 Board >> whereIs: aShip [
 
 	^ cells detect: [ :eachCell | eachCell includes: aShip ]

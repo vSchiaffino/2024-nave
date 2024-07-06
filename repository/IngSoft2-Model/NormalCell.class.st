@@ -4,7 +4,7 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'cell effect' }
 NormalCell >> applyEffectTo: aShip in: aBoard [
 
 	

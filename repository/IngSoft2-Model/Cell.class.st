@@ -7,32 +7,32 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'cell effect' }
 Cell >> applyEffectTo: aShip in: aBoard [
 
 	self subclassResponsibility
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'ship collision' }
+Cell >> checkCollisionIn: aGame [
+
+	ships size = 2 ifTrue: [
+		aGame handleCollisionBetween: (ships at: 1) and: (ships at: 2) ]
+]
+
+{ #category : #accessing }
 Cell >> enters: aShip [
 
 	ships add: aShip
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 Cell >> entersAll: someShips [
 
 	someShips do: [ :eachShip | self enters: eachShip ]
 ]
 
-{ #category : #'as yet unclassified' }
-Cell >> ifHasTwoShips: aBlockIfHasTwoShips [
-
-	ships size = 2 ifTrue: [
-		aBlockIfHasTwoShips value: ships first value: ships second ]
-]
-
-{ #category : #testing }
+{ #category : #accessing }
 Cell >> includes: aShip [
 
 	^ ships includes: aShip
@@ -44,13 +44,13 @@ Cell >> initialize [
 	ships := OrderedCollection new
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 Cell >> isOccupied [
 
 	^ ships notEmpty
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 Cell >> leaves: aShip [
 
 	ships remove: aShip

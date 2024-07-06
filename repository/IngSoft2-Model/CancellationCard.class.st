@@ -1,19 +1,11 @@
 Class {
 	#name : #CancellationCard,
-	#superclass : #InstantCard,
+	#superclass : #Card,
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #'as yet unclassified' }
-CancellationCard >> useIn: aBoard withActiveCards: someActiveCards withShips: someShips [
+{ #category : #'card effect' }
+CancellationCard >> useWith: aCardManager target: aTargetCard [
 
-	someActiveCards remove: targetCard.
-	targetCard beRemovedWithShips: someShips
-]
-
-{ #category : #'as yet unclassified' }
-CancellationCard >> verifyCanBeUsed: isMyTurn withActiveCards: someActiveCards [
-
-	(someActiveCards anySatisfy: [ :eachCard | eachCard = targetCard ])
-		ifFalse: [ Error signal: 'no such card in active cards!' ]
+	aCardManager removeEffectOf: aTargetCard
 ]

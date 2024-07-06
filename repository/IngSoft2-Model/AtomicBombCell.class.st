@@ -4,7 +4,7 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'cell effect' }
 AtomicBombCell >> applyEffectTo: aShip in: aBoard [
 
 	aBoard removeShieldFromAllShips.

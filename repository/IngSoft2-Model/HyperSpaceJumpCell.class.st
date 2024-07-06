@@ -4,7 +4,7 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'cell effect' }
 HyperSpaceJumpCell >> applyEffectTo: aShip in: aBoard [
 
 	aShip removeShield.

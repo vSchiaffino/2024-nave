@@ -25,7 +25,7 @@ WormholeCell class >> newPairIn: someCells start: wormholeStartLocation end: wor
 	someCells at: wormholeEndLocation put: (secondWormhole)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'cell effect' }
 WormholeCell >> applyEffectTo: aShip in: aBoard [
 
 	| aCell |

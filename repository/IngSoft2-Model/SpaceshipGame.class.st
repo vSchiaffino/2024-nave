@@ -5,14 +5,12 @@ Class {
 		'board',
 		'dice',
 		'ships',
-		'activeCards',
-		'deck',
-		'lastUsedCard'
+		'cardManager'
 	],
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'instance creation' }
 SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation lengthInParsecs: aLengthInParsecs [
 
 	| defaultCellGenerator defaultDeck defaultProbabilities |
@@ -59,7 +57,7 @@ SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: some
 		  deck: defaultDeck
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'instance creation' }
 SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation lengthInParsecs: aLengthInParsecs cellGenerator: aCellGenerator [
 	| defaultDeck |
 	defaultDeck := Deck new.
@@ -75,7 +73,7 @@ SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: some
 		  deck: defaultDeck 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'instance creation' }
 SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation lengthInParsecs: aLengthInParsecs cellGenerator: aCellGenerator deck: aDeck [
 
 	^ self new
@@ -90,12 +88,58 @@ SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: some
 		  deck: aDeck
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 SpaceshipGame >> cardsOf: aShipName [
 
 	| aShip |
 	aShip := self shipNamed: aShipName.
 	^ aShip cards copy
+]
+
+{ #category : #'turn logic' }
+SpaceshipGame >> handleBattleBetween: actualShip and: collidingShip [
+
+	| actualShipDiceResult collidingShipDiceResult loserShip loserShipAllies allLosers |
+	actualShipDiceResult := dice throw
+	                        +
+	                        (cardManager
+		                         applyBattleModifierTo: actualShip
+		                         using: dice).
+	collidingShipDiceResult := dice throw
+	                           +
+	                           (cardManager
+		                            applyBattleModifierTo: collidingShip
+		                            using: dice).
+
+	loserShip := actualShipDiceResult >= collidingShipDiceResult
+		             ifTrue: [ collidingShip ]
+		             ifFalse: [ actualShip ].
+
+	loserShipAllies := cardManager mercenariesOf: loserShip.
+	allLosers := loserShipAllies copyWith: loserShip.
+	allLosers do: [ :eachLoser |
+		eachLoser removeShield.
+		board moveToTheStart: eachLoser ]
+]
+
+{ #category : #'turn logic' }
+SpaceshipGame >> handleCollisionBetween: actualShip and: collidingShip [
+
+	cardManager
+		checkIf: actualShip
+		shouldBattleWith: collidingShip
+		in: self
+]
+
+{ #category : #'turn logic' }
+SpaceshipGame >> handleMovementOf: aShip [
+
+	| diceResult diceModifier |
+	diceResult := dice throw.
+	diceModifier := cardManager diceModifierTo: aShip.
+	board move: aShip by: diceResult + diceModifier.
+	board applyEffectTo: aShip.
+	board checkIf: aShip IsCollidingIn: self
 ]
 
 { #category : #accessing }
@@ -107,14 +151,14 @@ SpaceshipGame >> indexOfCellWith: aShipName [
 { #category : #initialization }
 SpaceshipGame >> initializeWith: someShipNames lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation lengthInParsecs: aLengthInParsecs cellGenerator: aCellGenerator deck: aDeck [
 
-	deck := aDeck.
-	activeCards := OrderedCollection new.
 	dice := someDice.
 	ships := someShipNames collect: [ :eachShipName |
 		         Ship
 			         named: eachShipName
 			         cards:
-			         (OrderedCollection with: deck drawCard with: deck drawCard) ].
+			         (OrderedCollection
+				          with: aDeck drawCard
+				          with: aDeck drawCard) ].
 	board := Board
 		         withShips: ships
 		         lengthInParsecs: aLengthInParsecs
@@ -122,46 +166,47 @@ SpaceshipGame >> initializeWith: someShipNames lapsToWin: aNumberOfLapsToWin usi
 		         wormholeStart: aWormholeStartLocation
 		         wormholeEnd: aWormholeEndLocation
 		         cellGenerator: aCellGenerator.
+	cardManager := CardManager
+		               withShips: ships
+		               withBoard: board
+		               withDeck: aDeck.
 	^ self
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 SpaceshipGame >> isOver [
 
 	^ board anyShipCompletedAllLaps
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 SpaceshipGame >> lapsOf: aShipName [
 
 	^ board lapsOf: (self shipNamed: aShipName)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'game controls' }
 SpaceshipGame >> playCard: aCard by: aShipName [
 
-	| aShip isShipTurn shipToPlay |
-	self verifyIsNotOver.
-	aShip := self shipNamed: aShipName.
-	shipToPlay := ships first.
-	isShipTurn := aShip = shipToPlay.
-	aCard lastCardWas: lastUsedCard.
-	aCard verifyCanBeUsed: isShipTurn withActiveCards: activeCards.
-	aShip
-		useCard: aCard
-		in: board
-		withActiveCards: activeCards
-		withShips: ships.
-	aCard ifWasUsed: [ lastUsedCard := aCard ]
+	self playCard: aCard by: aShipName target: nil
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'game controls' }
+SpaceshipGame >> playCard: aCard by: aShipName target: aTarget [
+
+	| aShip |
+	self verifyIsNotOver.
+	aShip := self shipNamed: aShipName.
+	cardManager playCard: aCard by: aShip target: aTarget
+]
+
+{ #category : #accessing }
 SpaceshipGame >> ranking [
 
 	^ board orderedShips collect: [ :ship | ship name ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'helper methods' }
 SpaceshipGame >> shipNamed: aShipName [
 
 	| aShip |
@@ -169,7 +214,7 @@ SpaceshipGame >> shipNamed: aShipName [
 	^ aShip
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'game controls' }
 SpaceshipGame >> skipsNextTurn [
 
 	| shipToPlay |
@@ -179,47 +224,30 @@ SpaceshipGame >> skipsNextTurn [
 	ships addLast: shipToPlay
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'game controls' }
 SpaceshipGame >> throwDice [
 
-	| shipToPlay diceResult actualShipDiceResult collidingShipDiceResult loserShip diceModifier |
+	| shipToPlay  |
 	self verifyIsNotOver.
 	shipToPlay := ships first.
-	shipToPlay applyTurnPenaltyElse: [
-		diceResult := dice throw.
-		diceModifier := (activeCards collect: [ :card |
-			                 card diceModifierTo: shipToPlay name ]) sumNumbers.
-		board move: shipToPlay by: diceResult + diceModifier.
-		board applyEffectTo: shipToPlay.
-		board if: shipToPlay isCollidding: [ :actualShip :collidingShip |
-			actualShip ifIsNotAlly: collidingShip do: [
-				actualShipDiceResult := actualShip throw: dice.
-				collidingShipDiceResult := collidingShip throw: dice.
-
-				loserShip := actualShipDiceResult >= collidingShipDiceResult
-					             ifTrue: [ collidingShip ]
-					             ifFalse: [ actualShip ].
-				loserShip removeShield.
-				board moveToTheStart: loserShip.
-				loserShip allies do: [ :eachAlly | board moveToTheStart: eachAlly ] ] ] ].
-
+	shipToPlay playIn: self.
 	ships removeFirst.
 	ships addLast: shipToPlay
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'helper methods' }
 SpaceshipGame >> verifyIsNotOver [
 
 	self isOver ifTrue: [ Error signal: 'game is over!' ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'helper methods' }
 SpaceshipGame >> verifyIsOver [
 
 	self isOver ifFalse: [ Error signal: 'game is not over yet' ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 SpaceshipGame >> winner [
 
 	self verifyIsOver.

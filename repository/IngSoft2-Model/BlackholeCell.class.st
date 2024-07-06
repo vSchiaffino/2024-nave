@@ -4,7 +4,7 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'cell effect' }
 BlackholeCell >> applyEffectTo: aShip in: aBoard [
 
 	aBoard move: aShip by: -4

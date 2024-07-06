@@ -9,7 +9,7 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #initialization }
+{ #category : #'instance creation' }
 CellProbability class >> cellCreation: aCellCreationBlock rangeStart: aRangeStart rangeEnd: aRangeEnd [
 
 	^ self new

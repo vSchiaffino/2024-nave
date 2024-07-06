@@ -8,7 +8,7 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #initialization }
+{ #category : #'instance creation' }
 CellGenerator class >> length: aNumberOfCells probabilites: someProbabilities [
 
 	self verifyAreValid: someProbabilities.
@@ -17,7 +17,7 @@ CellGenerator class >> length: aNumberOfCells probabilites: someProbabilities [
 		  probabilities: someProbabilities
 ]
 
-{ #category : #initialization }
+{ #category : #'helper methods' }
 CellGenerator class >> verifyAreValid: someProbabilities [
 
 	| probabilitiesSum |

@@ -7,27 +7,27 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #'instance creation' }
+{ #category : #'as yet unclassified' }
 Die class >> of: anAmountOfFaces [
 
 	self verifyAreValid: anAmountOfFaces.
 	^ self new initializeWith: anAmountOfFaces
 ]
 
-{ #category : #'instance creation' }
+{ #category : #'helper methods' }
 Die class >> verifyAreValid: anAmountOfFaces [
 
 	anAmountOfFaces <= 2 ifTrue: [
 		Error signal: 'number of faces must be greater than two' ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #initialization }
 Die >> initializeWith: anAmountOfFaces [
 
 	faces := anAmountOfFaces
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'dice logic' }
 Die >> throw [
 
 	^ faces atRandom

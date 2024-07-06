@@ -1,18 +1,13 @@
 Class {
 	#name : #SpeedCard,
-	#superclass : #PermanentCard,
+	#superclass : #Card,
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #'as yet unclassified' }
-SpeedCard >> diceModifierTo: aShipName [
+{ #category : #'card effect' }
+SpeedCard >> useWith: aCardManager target: aTargetShip [
 
-	aShipName ~= targetShipName ifTrue: [ ^ 0 ].
-	^ 1
-]
-
-{ #category : #'as yet unclassified' }
-SpeedCard >> useIn: aBoard withActiveCards: someActiveCards withShips: someShips [
-
-	someActiveCards add: self
+	aCardManager verifyIsCardPlayerTurn.
+	aCardManager addCardEffect:
+		(OneShipDiceModifier to: aTargetShip createdBy: self)
 ]

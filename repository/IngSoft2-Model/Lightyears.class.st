@@ -7,7 +7,7 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #accessing }
+{ #category : #'instance creation' }
 Lightyears class >> amount: anAmount [
 
 	^ self new initializeWith: anAmount
@@ -19,7 +19,7 @@ Lightyears >> initializeWith: anAmount [
 	amount := anAmount
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #converting }
 Lightyears >> toCellsOf: aBoard [
 
 	| amountInParsecs |

@@ -7,13 +7,13 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'instance creation' }
 MoonwalkCell class >> times: aNumberOfTimes [
 
 	^ self new initializeWith: aNumberOfTimes
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'cell effect' }
 MoonwalkCell >> applyEffectTo: aShip in: aBoard [
 
 	aBoard moveAllShips: times negated except: aShip

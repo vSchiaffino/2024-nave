@@ -7,7 +7,7 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'instance creation' }
 CardGivingCell class >> deck: aDeck [
 
 	^ super new initializeWith: aDeck
@@ -19,7 +19,7 @@ CardGivingCell class >> new [
 	^ self deck: Deck new
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'cell effect' }
 CardGivingCell >> applyEffectTo: aShip in: aBoard [
 
 	aShip receive: deck drawCard

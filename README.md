@@ -1,7 +1,7 @@
 # Ingenieria del Software II
 
 ![GHA Status](https://github.com/vschiaffino/2024-nave/actions/workflows/GHA.yml/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/vschiaffino/2024-nave/badge.svg?branch=master)](https://coveralls.io/github/vschiaffino/2024-nave?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/vSchiaffino/2024-nave/badge.svg?branch=master)](https://coveralls.io/github/vSchiaffino/2024-nave?branch=master)
 
 ## Metacello
 

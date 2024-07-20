@@ -908,6 +908,43 @@ GameTest >> testWhenAShipTargetsItselfWithAMercenaryCardShouldThrowAnError [
 ]
 
 { #category : #tests }
+GameTest >> testWhenAShipWasDoubledAndBattlesThenShouldDoubleItDiceResult [
+
+	| aShip someShips aGame someDice anotherShip someCards aDoubleCard cardsToDraw |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 1 2 3 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: DoubleCard new
+		               with: DoubleCard new
+		               with: DoubleCard new
+		               with: DoubleCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 4
+		         wormholeEnd: 3
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	someCards := aGame cardsOf: aShip.
+	aDoubleCard := someCards first.
+
+	aGame playCard: aDoubleCard by: aShip target: aShip.
+
+	aGame throwDice.
+	aGame throwDice.
+
+	self assert: (aGame indexOfCellWith: aShip) equals: 2.
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 1
+]
+
+{ #category : #tests }
 GameTest >> testWhenASpeedEffectAndMercenaryEffectAreActiveThenMercenaryShouldHelp [
 
 	| aShip aGame someShips someDice anotherShip aSpeedCard cardsToDraw aMercenaryCard aDeck yetAnotherShip |

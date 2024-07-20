@@ -5,7 +5,8 @@ Class {
 		'shields',
 		'penalty',
 		'name',
-		'cards'
+		'cards',
+		'battleModifier'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -14,6 +15,18 @@ Class {
 Ship class >> named: aShipName cards: someCards [
 
 	^ self new initializeWith: aShipName cards: someCards
+]
+
+{ #category : #adding }
+Ship >> activateDoubleBattleModifier [
+
+	battleModifier := DoubleBattleModifier new
+]
+
+{ #category : #adding }
+Ship >> activateNormalBattleModifier [
+
+	battleModifier := NormalBattleModifier new
 ]
 
 { #category : #accessing }
@@ -25,6 +38,7 @@ Ship >> cards [
 { #category : #initialization }
 Ship >> initializeWith: aName cards: someCards [
 
+	battleModifier := NormalBattleModifier new.
 	name := aName.
 	shields := 3.
 	penalty := 0.
@@ -71,6 +85,17 @@ Ship >> removeShield [
 Ship >> restoreShields [
 
 	shields := 3
+]
+
+{ #category : #'dice throw' }
+Ship >> throw: aDice [
+
+	| normalDiceResult modifiedDiceResult |
+	normalDiceResult := aDice throw.
+	modifiedDiceResult := battleModifier
+		                      modify: normalDiceResult
+		                      to: self.
+	^ modifiedDiceResult
 ]
 
 { #category : #'deck logic' }

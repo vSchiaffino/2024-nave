@@ -27,9 +27,12 @@ CardManager >> addCardEffect: aCardEffect [
 { #category : #'card effect' }
 CardManager >> applyBattleModifierTo: aShip using: aDice [
 
-	| shipAllies |
+	| shipAllies shipThrowResult shipAlliesThrowResult |
 	shipAllies := self mercenariesOf: aShip.
-	^ (shipAllies collect: [ :ally | aDice throw ]) sumNumbers
+	shipThrowResult := aShip throw: aDice.
+	shipAlliesThrowResult := (shipAllies collect: [ :ally |
+		                          ally throw: aDice ]) sumNumbers.
+	^ shipThrowResult + shipAlliesThrowResult
 ]
 
 { #category : #'card effect' }
@@ -57,6 +60,14 @@ CardManager >> diceModifierTo: aShip [
 
 	^ (activeCardEffects collect: [ :eachCardEffect |
 		   eachCardEffect diceModifierTo: aShip name ]) sumNumbers
+]
+
+{ #category : #'card effect' }
+CardManager >> doubleBattleModifierTo: aShipName [
+
+	| aShip |
+	aShip := self shipNamed: aShipName.
+	aShip activateDoubleBattleModifier
 ]
 
 { #category : #initialization }

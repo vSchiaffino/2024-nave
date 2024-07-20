@@ -100,16 +100,12 @@ SpaceshipGame >> cardsOf: aShipName [
 SpaceshipGame >> handleBattleBetween: actualShip and: collidingShip [
 
 	| actualShipDiceResult collidingShipDiceResult loserShip loserShipAllies allLosers |
-	actualShipDiceResult := dice throw
-	                        +
-	                        (cardManager
-		                         applyBattleModifierTo: actualShip
-		                         using: dice).
-	collidingShipDiceResult := dice throw
-	                           +
-	                           (cardManager
-		                            applyBattleModifierTo: collidingShip
-		                            using: dice).
+	actualShipDiceResult := cardManager
+		                        applyBattleModifierTo: actualShip
+		                        using: dice.
+	collidingShipDiceResult := cardManager
+		                           applyBattleModifierTo: collidingShip
+		                           using: dice.
 
 	loserShip := actualShipDiceResult >= collidingShipDiceResult
 		             ifTrue: [ collidingShip ]

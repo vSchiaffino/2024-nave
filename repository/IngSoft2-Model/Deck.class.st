@@ -23,7 +23,14 @@ Deck class >> length: aNumberOfCards [
 { #category : #drawing }
 Deck >> dealTo: aShip [
 
+	cards isEmpty ifTrue: [ self shuffleDiscarded ].
 	cards isEmpty ifFalse: [ aShip receive: cards removeFirst ]
+]
+
+{ #category : #'deck control' }
+Deck >> discard: aCard [
+
+	discardedCards add: aCard
 ]
 
 { #category : #drawing }
@@ -50,4 +57,16 @@ Deck >> initializeWithCards: someCards [
 
 	discardedCards := OrderedCollection new.
 	cards := someCards
+]
+
+{ #category : #drawing }
+Deck >> shuffleDiscarded [
+
+	| shuffledDiscardedCards aRandomDiscardedCard |
+	shuffledDiscardedCards := OrderedCollection new.
+	discardedCards size timesRepeat: [
+		aRandomDiscardedCard := discardedCards atRandom.
+		discardedCards remove: aRandomDiscardedCard.
+		shuffledDiscardedCards add: aRandomDiscardedCard ].
+	cards addAll: shuffledDiscardedCards
 ]

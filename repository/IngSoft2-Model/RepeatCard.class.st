@@ -7,5 +7,6 @@ Class {
 { #category : #'card effect' }
 RepeatCard >> useWith: aCardManager target: aTargetShip [
 
-	aCardManager repeatLastCellEffectTo: aTargetShip
+	aCardManager repeatLastCellEffectTo: aTargetShip.
+	aCardManager discard: self
 ]

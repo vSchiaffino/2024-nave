@@ -70,6 +70,12 @@ CardManager >> diceModifierTo: aShip [
 		   eachCardEffect diceModifierTo: aShip name ]) sumNumbers
 ]
 
+{ #category : #adding }
+CardManager >> discard: aCard [
+
+	deck discard: aCard
+]
+
 { #category : #'card effect' }
 CardManager >> doubleBattleModifierTo: aShipName [
 

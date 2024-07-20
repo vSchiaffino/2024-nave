@@ -1903,6 +1903,84 @@ GameTest >> testWhenNoCardsLeftInDeckThenCardGivingCellShouldNotGiveAnyCard [
 ]
 
 { #category : #tests }
+GameTest >> testWhenNoCardsLeftInDeckThenUseADefendCardThenLandsInACardGivingCellShouldBeNowInTheDeck [
+
+	| aShip someShips aGame someDice someCells aDeck someCards aDefendCard |
+	aShip := 'test-ship-1'.
+	someShips := OrderedCollection with: aShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 ) asOrderedCollection)).
+	aDeck := Deck cards:
+		         (OrderedCollection
+			          with: DefendCard new
+			          with: DefendCard new).
+	someCells := OrderedCollection new.
+	someCells
+		add: NormalCell new;
+		add: (CardGivingCell deck: aDeck);
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells size
+		         wormholeStart: 4
+		         wormholeEnd: 5
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator cells: someCells)
+		         deck: aDeck.
+	someCards := aGame cardsOf: aShip.
+	aDefendCard := someCards first.
+	aGame playCard: aDefendCard by: aShip target: aShip.
+	aGame throwDice.
+
+	self assert: (aGame cardsOf: aShip) size equals: 2.
+	self assert: ((aGame cardsOf: aShip) includes: aDefendCard)
+]
+
+{ #category : #tests }
+GameTest >> testWhenNoCardsLeftInDeckThenUseADoubleCardThenLandsInACardGivingCellShouldBeNowInTheDeck [
+
+	| aShip someShips aGame someDice someCells aDeck someCards aDoubleCard |
+	aShip := 'test-ship-1'.
+	someShips := OrderedCollection with: aShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 ) asOrderedCollection)).
+	aDeck := Deck cards:
+		         (OrderedCollection
+			          with: DoubleCard new
+			          with: DoubleCard new).
+	someCells := OrderedCollection new.
+	someCells
+		add: NormalCell new;
+		add: (CardGivingCell deck: aDeck);
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells size
+		         wormholeStart: 4
+		         wormholeEnd: 5
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator cells: someCells)
+		         deck: aDeck.
+	someCards := aGame cardsOf: aShip.
+	aDoubleCard := someCards first.
+	aGame playCard: aDoubleCard by: aShip target: aShip.
+	aGame throwDice.
+
+	self assert: (aGame cardsOf: aShip) size equals: 2.
+	self assert: ((aGame cardsOf: aShip) includes: aDoubleCard)
+]
+
+{ #category : #tests }
 GameTest >> testWhenNoCardsLeftInDeckThenUseAPermanentCardThenCancelItShouldBeNowInTheDeck [
 
 	| aShip someShips aGame someDice someCells aDeck someCards aRepeatCard |

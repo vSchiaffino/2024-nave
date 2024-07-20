@@ -798,7 +798,7 @@ GameTest >> testWhenAShipPlaysCancellationCardAndCardToRemoveIsSpeedCardAndThere
 { #category : #tests }
 GameTest >> testWhenAShipPlaysCancellationCardAndThereAreZeroActiveCardsShouldThrowAnError [
 
-	| aShip aGame someShips someDice anotherShip aSpeedCard deck cardsToDraw aCancellationCard |
+	| aShip aGame someShips someDice anotherShip aSpeedCard cardsToDraw aCancellationCard |
 	aShip := 'test-ship-1'.
 	anotherShip := 'test-ship-2'.
 	someShips := OrderedCollection with: aShip with: anotherShip.
@@ -807,7 +807,11 @@ GameTest >> testWhenAShipPlaysCancellationCardAndThereAreZeroActiveCardsShouldTh
 			             (LoadedDie sequence: #( 7 4 ) asOrderedCollection)).
 	cardsToDraw := OrderedCollection
 		               with: SpeedCard new
+		               with: CancellationCard new
+		               with: SpeedCard new
 		               with: CancellationCard new.
+	aSpeedCard := cardsToDraw at: 3.
+	aCancellationCard := cardsToDraw at: 4.
 	aGame := SpaceshipGame
 		         with: someShips
 		         lapsToWin: 2
@@ -817,13 +821,15 @@ GameTest >> testWhenAShipPlaysCancellationCardAndThereAreZeroActiveCardsShouldTh
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
-	deck := aGame cardsOf: aShip.
-	aSpeedCard := deck first.
-	aCancellationCard := deck second.
+		         deck: (Deck cards: cardsToDraw).
+
 	aGame throwDice.
 	self
-		should: [ aGame playCard: aCancellationCard by: anotherShip target: aSpeedCard ]
+		should: [
+			aGame
+				playCard: aCancellationCard
+				by: anotherShip
+				target: aSpeedCard ]
 		raise: Error
 		withMessage: 'no such card in active cards!'
 ]
@@ -1261,7 +1267,7 @@ GameTest >> testWhenCancelAMercenaryShipWhenThereIsAnotherPermanentCardItShouldN
 { #category : #tests }
 GameTest >> testWhenCancelASpeedCardThenShouldNotApplyTheCardEffect [
 
-	| aShip aGame someShips someDice anotherShip aSpeedCard deck cardsToDraw aCancellationCard |
+	| aShip aGame someShips someDice anotherShip aSpeedCard cardsToDraw aCancellationCard aDeck anotherDeck |
 	aShip := 'test-ship-1'.
 	anotherShip := 'test-ship-2'.
 	someShips := OrderedCollection with: aShip with: anotherShip.
@@ -1269,6 +1275,8 @@ GameTest >> testWhenCancelASpeedCardThenShouldNotApplyTheCardEffect [
 		            (Set with:
 			             (LoadedDie sequence: #( 7 4 ) asOrderedCollection)).
 	cardsToDraw := OrderedCollection
+		               with: SpeedCard new
+		               with: CancellationCard new
 		               with: SpeedCard new
 		               with: CancellationCard new.
 	aGame := SpaceshipGame
@@ -1280,10 +1288,11 @@ GameTest >> testWhenCancelASpeedCardThenShouldNotApplyTheCardEffect [
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
-	deck := aGame cardsOf: aShip.
-	aSpeedCard := deck first.
-	aCancellationCard := deck second.
+		         deck: (Deck cards: cardsToDraw).
+	aDeck := aGame cardsOf: aShip.
+	anotherDeck := aGame cardsOf: anotherShip.
+	aSpeedCard := aDeck first.
+	aCancellationCard := anotherDeck second.
 	aGame playCard: aSpeedCard by: aShip target: anotherShip.
 	aGame throwDice.
 	aGame playCard: aCancellationCard by: anotherShip target: aSpeedCard.

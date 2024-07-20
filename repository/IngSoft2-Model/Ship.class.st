@@ -7,7 +7,8 @@ Class {
 		'name',
 		'cards',
 		'battleModifier',
-		'maxShields'
+		'maxShields',
+		'penaltyState'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -18,13 +19,13 @@ Ship class >> named: aShipName using: aDeck [
 	^ self new initializeWith: aShipName using: aDeck
 ]
 
-{ #category : #adding }
+{ #category : #'battle modifier' }
 Ship >> activateDoubleBattleModifier [
 
 	battleModifier := DoubleBattleModifier new
 ]
 
-{ #category : #adding }
+{ #category : #'battle modifier' }
 Ship >> activateNormalBattleModifier [
 
 	battleModifier := NormalBattleModifier new
@@ -44,13 +45,21 @@ Ship >> cards [
 	^ cards
 ]
 
+{ #category : #'penalty logic' }
+Ship >> endPenalty [
+
+	self restoreShields.
+	penaltyState := NotPenalizedState new
+]
+
 { #category : #initialization }
 Ship >> initializeWith: aName using: aDeck [
 
 	cards := OrderedCollection new.
 	aDeck dealTo: self.
 	aDeck dealTo: self.
-
+	penaltyState := NotPenalizedState new.
+	
 	battleModifier := NormalBattleModifier new.
 	name := aName.
 	shields := 3.
@@ -68,11 +77,7 @@ Ship >> name [
 { #category : #playing }
 Ship >> playIn: aGame [
 
-	penalty > 0
-		ifTrue: [
-			penalty = 2 ifTrue: [ self restoreShields ].
-			penalty := penalty - 1 ]
-		ifFalse: [ aGame handleMovementOf: self ]
+	penaltyState playAs: self in: aGame.
 ]
 
 { #category : #'deck logic' }
@@ -91,7 +96,7 @@ Ship >> removeFromDeck: aCard [
 Ship >> removeShield [
 
 	shields := shields - 1.
-	shields = 0 ifTrue: [ penalty := 2 ]
+	shields = 0 ifTrue: [ penaltyState := PenalizedState new ]
 ]
 
 { #category : #'shields logic' }

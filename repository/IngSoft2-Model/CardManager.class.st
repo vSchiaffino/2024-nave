@@ -38,8 +38,7 @@ CardManager >> assignMercenaryShipToCardPlayer: aNewMercenaryName by: aCard [
 	| newMercenary |
 	actualShipPlayingCard name = aNewMercenaryName ifTrue: [
 		Error signal: 'you cannot target yourself as a Mercenary!' ].
-	newMercenary := ships detect: [ :eachShip |
-		                eachShip name = aNewMercenaryName ].
+	newMercenary := self shipNamed: aNewMercenaryName.
 	activeCardEffects add: (MercenaryEffect
 			 createdBy: aCard
 			 from: actualShipPlayingCard
@@ -127,6 +126,12 @@ CardManager >> repeatLastCardWithTarget: aTarget [
 CardManager >> repeatLastCellEffectTo: aShipName [
 
 	board applyLastEffectTo: aShipName
+]
+
+{ #category : #'card effect' }
+CardManager >> shipNamed: aShipName [
+
+	^ ships detect: [ :eachShip | eachShip name = aShipName ]
 ]
 
 { #category : #'helper methods' }

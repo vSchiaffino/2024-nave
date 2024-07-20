@@ -3008,6 +3008,58 @@ GameTest >> testWhenShipUsesDefendCardThenRunsOutOfShieldsThenShouldRunOfShields
 ]
 
 { #category : #tests }
+GameTest >> testWhenShipUsesTwoDefendCardInARowHavingThreeShieldsThenShouldHaveFourShields [
+
+	| aShip someShips aGame someDice anotherShip cardsToDraw someCards aDefendCard anotherDefendCard |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll: (Set with: (LoadedDie sequence:
+				              #( 1 1 10 5 1 2 10 5 1 3 10 5 1 4 10 5 1 1 )
+					              asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: DefendCard new
+		               with: DefendCard new
+		               with: DefendCard new
+		               with: DefendCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 20
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 9
+		         wormholeEnd: 10
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (LoadedDeck cards: cardsToDraw).
+	someCards := aGame cardsOf: anotherShip.
+	aDefendCard := someCards first.
+	anotherDefendCard := someCards second.
+
+	aGame playCard: aDefendCard by: anotherShip target: anotherShip.
+	aGame playCard: anotherDefendCard by: anotherShip target: anotherShip.
+	aGame throwDice.
+	aGame throwDice. " pelea"
+
+	aGame throwDice.
+	aGame throwDice. " pelea"
+
+	aGame throwDice.
+	aGame throwDice. " pelea"
+
+	aGame throwDice.
+	aGame throwDice. " pelea"
+
+	aGame throwDice.
+	aGame throwDice. " pierde turno"
+
+	aGame throwDice.
+	aGame throwDice. "pierde turno"
+
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 1
+]
+
+{ #category : #tests }
 GameTest >> testWhenShipsEntersToAWormholeAndThereIsAnotherShipInTheOtherWormholeThenTheyShouldBattle [
 
 	| aShip someShips aGame someDice anotherShip |

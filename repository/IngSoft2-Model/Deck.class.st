@@ -62,11 +62,9 @@ Deck >> initializeWithCards: someCards [
 { #category : #drawing }
 Deck >> shuffleDiscarded [
 
-	| shuffledDiscardedCards aRandomDiscardedCard |
-	shuffledDiscardedCards := OrderedCollection new.
-	discardedCards size timesRepeat: [
-		aRandomDiscardedCard := discardedCards atRandom.
-		discardedCards remove: aRandomDiscardedCard.
-		shuffledDiscardedCards add: aRandomDiscardedCard ].
+	| shuffledDiscardedCards sortRandomlyBlock |
+	sortRandomlyBlock := [ :a :b | Random new next < 0.5 ].
+	shuffledDiscardedCards := discardedCards sorted: sortRandomlyBlock.
+	discardedCards removeAll.
 	cards addAll: shuffledDiscardedCards
 ]

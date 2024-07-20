@@ -6,7 +6,8 @@ Class {
 		'penalty',
 		'name',
 		'cards',
-		'battleModifier'
+		'battleModifier',
+		'maxShields'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -29,6 +30,14 @@ Ship >> activateNormalBattleModifier [
 	battleModifier := NormalBattleModifier new
 ]
 
+{ #category : #'card effect' }
+Ship >> applyDefendEffect [
+
+	shields = maxShields
+		ifTrue: [ maxShields := maxShields + 1 ]
+		ifFalse: [ shields := shields + 1 ]
+]
+
 { #category : #accessing }
 Ship >> cards [
 
@@ -41,6 +50,7 @@ Ship >> initializeWith: aName cards: someCards [
 	battleModifier := NormalBattleModifier new.
 	name := aName.
 	shields := 3.
+	maxShields := 3.
 	penalty := 0.
 	cards := someCards.
 	^ self
@@ -57,7 +67,7 @@ Ship >> playIn: aGame [
 
 	penalty > 0
 		ifTrue: [
-			penalty = 2 ifTrue: [ shields := 3 ].
+			penalty = 2 ifTrue: [ self restoreShields ].
 			penalty := penalty - 1 ]
 		ifFalse: [ aGame handleMovementOf: self ]
 ]
@@ -84,7 +94,7 @@ Ship >> removeShield [
 { #category : #'shields logic' }
 Ship >> restoreShields [
 
-	shields := 3
+	shields := maxShields
 ]
 
 { #category : #'dice throw' }

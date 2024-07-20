@@ -35,6 +35,14 @@ CardManager >> applyBattleModifierTo: aShip using: aDice [
 	^ shipThrowResult + shipAlliesThrowResult
 ]
 
+{ #category : #'card usage' }
+CardManager >> applyDefendTo: aShipName [
+
+	| ship |
+	ship := self shipNamed: aShipName.
+	ship applyDefendEffect
+]
+
 { #category : #'card effect' }
 CardManager >> assignMercenaryShipToCardPlayer: aNewMercenaryName by: aCard [
 

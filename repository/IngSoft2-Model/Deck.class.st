@@ -20,12 +20,6 @@ Deck >> dealTo: aShip [
 ]
 
 { #category : #drawing }
-Deck >> drawCard [
-
-	^ cards removeFirst
-]
-
-{ #category : #drawing }
 Deck >> initializeWith: aNumberOfCards [
 
 	| cardCreators cardCreatorBlock createdCard |

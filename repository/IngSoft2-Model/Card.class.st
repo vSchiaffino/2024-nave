@@ -8,12 +8,6 @@ Class {
 }
 
 { #category : #'instance creation' }
-Card class >> new [
-
-	^ self basicNew initialize
-]
-
-{ #category : #'instance creation' }
 Card class >> newWithOriginalCard: anOriginalCard [
 
 	^ self basicNew initializeWithOriginalCard: anOriginalCard

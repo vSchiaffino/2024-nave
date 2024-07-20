@@ -1,13 +1,35 @@
 Class {
 	#name : #Deck,
 	#superclass : #Object,
+	#instVars : [
+		'cards'
+	],
 	#category : #'IngSoft2-Model'
 }
+
+{ #category : #accessing }
+Deck class >> length: aNumberOfCards [
+
+	^ self new initializeWith: aNumberOfCards
+]
+
+{ #category : #drawing }
+Deck >> dealTo: aShip [
+
+	cards isEmpty ifFalse: [ aShip receive: cards removeFirst ]
+]
 
 { #category : #drawing }
 Deck >> drawCard [
 
-	| cardCreators cardCreatorBlock |
+	^ cards removeFirst
+]
+
+{ #category : #drawing }
+Deck >> initializeWith: aNumberOfCards [
+
+	| cardCreators cardCreatorBlock createdCard |
+	cards := OrderedCollection new.
 	cardCreators := {
 		                [ AccelerationCard new ].
 		                [ CancellationCard new ].
@@ -15,6 +37,8 @@ Deck >> drawCard [
 		                [ RepeatCard new ].
 		                [ SpeedCard new ].
 		                [ MercenaryCard new ] }.
-	cardCreatorBlock := cardCreators atRandom.
-	^ cardCreatorBlock value
+	1 to: aNumberOfCards do: [ :index |
+		cardCreatorBlock := cardCreators atRandom.
+		createdCard := cardCreatorBlock value.
+		cards add: createdCard ]
 ]

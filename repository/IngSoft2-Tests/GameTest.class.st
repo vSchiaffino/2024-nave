@@ -21,7 +21,8 @@ GameTest >> testARandomMatchEnds [
 		         withCells: 15
 		         wormholeStart: 4
 		         wormholeEnd: 5
-		         lengthInParsecs: 200.
+		         lengthInParsecs: 200
+					withNumberOfCards: 20.
 		
 	[aGame isOver] whileFalse: [ 
 		aGame throwDice.
@@ -188,6 +189,7 @@ GameTest >> testIfGameIsNotOverThenWinnerShouldThrowError [
 		         wormholeStart: 2
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
+					withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
 	self
 		should: [ aGame winner ]
@@ -386,6 +388,7 @@ GameTest >> testWhenAShipCompletedTheRequiredLapsThenShouldBeOver [
 		         wormholeStart: 2
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
+							withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 5).
 	aGame throwDice.
 	self assert: aGame isOver
@@ -408,6 +411,7 @@ GameTest >> testWhenAShipCompletedThreeLapsNumberOfLapsShouldBeThree [
 		         wormholeStart: 2
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
 	aGame throwDice.
 	aGame throwDice.
@@ -444,6 +448,7 @@ GameTest >> testWhenAShipEntersIntoAMoonwalkCellAndOneShipGoesBackMoreThanTheFir
 		         wormholeStart: 2
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 
 	aGame throwDice.
@@ -484,6 +489,7 @@ GameTest >> testWhenAShipEntersIntoAMoonwalkCellThenItShouldStayInThatCell [
 		         wormholeStart: 2
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 	aGame throwDice.
 	aGame throwDice.
@@ -523,6 +529,7 @@ GameTest >> testWhenAShipEntersIntoAMoonwalkCellWithThreeStepsThenAllTheOtherShi
 		         wormholeStart: 2
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 	aGame throwDice.
 	aGame throwDice.
@@ -551,7 +558,7 @@ GameTest >> testWhenAShipEntersToABlackholeCellThenLandsInAnotherBlackholeCellTh
 	someCells add: NormalCell new.
 	someCells add: BlackholeCell new.
 	someCells add: NormalCell new.
-	
+
 	aGame := SpaceshipGame
 		         with: someShips
 		         lapsToWin: 2
@@ -560,6 +567,7 @@ GameTest >> testWhenAShipEntersToABlackholeCellThenLandsInAnotherBlackholeCellTh
 		         wormholeStart: 4
 		         wormholeEnd: 5
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 	aGame throwDice.
 
@@ -582,7 +590,8 @@ GameTest >> testWhenAShipEntersToAWormholeThenItShouldBeOnTheOtherWormhole [
 		         withCells: 15
 		         wormholeStart: 4
 		         wormholeEnd: 5
-		         lengthInParsecs: 200.
+		         lengthInParsecs: 200
+					withNumberOfCards: 20.
 	aGame throwDice.
 	
 	self assert: (aGame indexOfCellWith: aShip) equals: 5.
@@ -644,7 +653,7 @@ GameTest >> testWhenAShipLandsInACardGivingCellTheShipShouldHaveOneMoreCard [
 			             (LoadedDie sequence: #( 1 ) asOrderedCollection)).
 	someCells := OrderedCollection new.
 	someCells add: NormalCell new.
-	someCells add: CardGivingCell new.
+	someCells add: (CardGivingCell deck: (Deck length: 1)).
 	someCells add: NormalCell new.
 	someCells add: NormalCell new.
 
@@ -656,6 +665,7 @@ GameTest >> testWhenAShipLandsInACardGivingCellTheShipShouldHaveOneMoreCard [
 		         wormholeStart: 3
 		         wormholeEnd: 4
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 	aGame throwDice.
 
@@ -1389,9 +1399,9 @@ GameTest >> testWhenGameIsOverThenTheRankingShouldShowTheCorrectOrderOfShips [
 		             with: aShip
 		             with: anotherShip
 		             with: yetAnotherShip.
-	someDice := Dice withAll: (Set with:
-			             (LoadedDie sequence:
-				              #( 3 2 1 ) asOrderedCollection)).
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 3 2 1 ) asOrderedCollection)).
 	aGame := SpaceshipGame
 		         with: someShips
 		         lapsToWin: 2
@@ -1400,6 +1410,7 @@ GameTest >> testWhenGameIsOverThenTheRankingShouldShowTheCorrectOrderOfShips [
 		         wormholeStart: 8
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
 	aGame throwDice.
 	aGame throwDice.
@@ -1428,6 +1439,7 @@ GameTest >> testWhenHasTwoLapsAndAShipCompletedTwoLapsShouldBeOver [
 		         wormholeStart: 2
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 5).
 	aGame throwDice.
 	aGame throwDice.
@@ -1547,7 +1559,7 @@ GameTest >> testWhenLastEffectWasCardGivingCellAndUseTheRepeatCardThenShouldAppl
 			             (LoadedDie sequence: #( 1 ) asOrderedCollection)).
 	someCells := OrderedCollection new.
 	someCells add: NormalCell new.
-	someCells add: CardGivingCell new.
+	someCells add: (CardGivingCell deck: (Deck length: 2)).
 	someCells add: NormalCell new.
 	someCells add: NormalCell new.
 	someCells add: NormalCell new.
@@ -1834,6 +1846,38 @@ GameTest >> testWhenMercenaryShipBattlesWithTheMercenaryCardUserTheyShouldNotBat
 ]
 
 { #category : #tests }
+GameTest >> testWhenNoCardsLeftInDeckThenCardGivingCellShouldNotGiveAnyCard [
+
+	| aShip someShips aGame someDice someCells aDeck |
+	aShip := 'test-ship-1'.
+	someShips := OrderedCollection with: aShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 ) asOrderedCollection)).
+	aDeck := Deck length: 2.
+	someCells := OrderedCollection new.
+	someCells
+		add: NormalCell new;
+		add: (CardGivingCell deck: aDeck);
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells size
+		         wormholeStart: 4
+		         wormholeEnd: 5
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator cells: someCells)
+		         deck: aDeck.
+
+	aGame throwDice.
+	self assert: (aGame cardsOf: aShip) size equals: 2
+]
+
+{ #category : #tests }
 GameTest >> testWhenNoShipCompletedTheLapsThenGameShouldNotBeOver [
 
 	| aShip aGame someDice someShips |
@@ -1850,6 +1894,7 @@ GameTest >> testWhenNoShipCompletedTheLapsThenGameShouldNotBeOver [
 		         wormholeStart: 2
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 4).
 	aGame throwDice.
 	self deny: aGame isOver
@@ -2205,6 +2250,7 @@ GameTest >> testWhenSecondShipsLosesTwoShieldsAndThenAnotherShieldDueToAtomicBom
 		         wormholeStart: 5
 		         wormholeEnd: 6
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 
 	aGame throwDice.
@@ -2218,7 +2264,7 @@ GameTest >> testWhenSecondShipsLosesTwoShieldsAndThenAnotherShieldDueToAtomicBom
 	"Loser Turn"
 	aGame throwDice.
 	aGame throwDice.
-	
+
 	self assert: (aGame indexOfCellWith: aShip) equals: 3.
 	self assert: (aGame indexOfCellWith: anotherShip) equals: 1
 ]
@@ -2306,6 +2352,7 @@ GameTest >> testWhenShipEntersManyTimesToAHyperjumpCellThenShouldMoveAccordingTo
 		         wormholeStart: 5
 		         wormholeEnd: 6
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells)
 ]
 
@@ -2335,6 +2382,7 @@ GameTest >> testWhenShipEntersToABlackholeCellThenShouldGoBackFourCells [
 		         wormholeStart: 5
 		         wormholeEnd: 6
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 	aGame throwDice.
 
@@ -2370,6 +2418,7 @@ GameTest >> testWhenShipEntersToAHyperJumpCellThenShouldMoveTheDesiredAmountOfLi
 		         wormholeStart: 5
 		         wormholeEnd: 6
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 
 	aGame throwDice.
@@ -2406,6 +2455,7 @@ GameTest >> testWhenShipEntersToAHyperJumpCellThenShouldMoveTheDesiredAmountOfPa
 		         wormholeStart: 5
 		         wormholeEnd: 6
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 
 	aGame throwDice.
@@ -2442,6 +2492,7 @@ GameTest >> testWhenShipEntersToAHyperSpaceJumpCellAndThatShipLosesTwoTimesShoul
 		         wormholeStart: 1
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 	aGame throwDice.
 	aGame throwDice.
@@ -2484,6 +2535,7 @@ GameTest >> testWhenShipEntersToAHyperSpaceJumpCellThenShouldGoForwardFourCells 
 		         wormholeStart: 1
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 	aGame throwDice.
 
@@ -2526,6 +2578,7 @@ GameTest >> testWhenShipEntersToAHyperSpaceJumpCellThreeTimesInARowItShouldLoseT
 		         wormholeStart: 1
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 	aGame throwDice.
 	aGame throwDice.
@@ -2566,6 +2619,7 @@ GameTest >> testWhenShipEntersToAHyperjumpCellAndParsecIsNotEnoughToMoveOneCellT
 		         wormholeStart: 4
 		         wormholeEnd: 5
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 
 	aGame throwDice.
@@ -2580,10 +2634,13 @@ GameTest >> testWhenShipEntersToAnAtomicBombCellAllShipsShouldGoBackToTheBeginni
 	aShip := 'test-ship-1'.
 	anotherShip := 'test-ship-2'.
 	yetAnotherShip := 'test-ship-3'.
-	someShips := OrderedCollection with: aShip with: anotherShip with: yetAnotherShip.
-	someDice := Dice withAll: (Set with:
-			             (LoadedDie sequence:
-				              #( 1 2 5 ) asOrderedCollection)).
+	someShips := OrderedCollection
+		             with: aShip
+		             with: anotherShip
+		             with: yetAnotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 2 5 ) asOrderedCollection)).
 	someCells := OrderedCollection new.
 	someCells add: NormalCell new.
 	someCells add: NormalCell new.
@@ -2600,6 +2657,7 @@ GameTest >> testWhenShipEntersToAnAtomicBombCellAllShipsShouldGoBackToTheBeginni
 		         wormholeStart: 4
 		         wormholeEnd: 5
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 	aGame throwDice.
 	aGame throwDice.
@@ -2741,7 +2799,8 @@ GameTest >> testWhenShipIsInFirstCellAndAskForTheIndexOfThatCellShouldBeTheFirst
 		         withCells: 10
 		         wormholeStart: 3
 		         wormholeEnd: 4
-		         lengthInParsecs: 100.
+		         lengthInParsecs: 100
+					withNumberOfCards: 20.
 
 	self assert: (aGame indexOfCellWith: aShip) equals: 1
 ]
@@ -2763,6 +2822,7 @@ GameTest >> testWhenShipIsInLastCellThenPlaysNextTurnShouldThrowError [
 		         wormholeStart: 1
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
 	aGame throwDice.
 	self
@@ -2788,6 +2848,7 @@ GameTest >> testWhenShipIsInLastCellThenTheIndexOfThatCellShouldBeTheLastIndex [
 		         wormholeStart: 1
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
 	aGame throwDice.
 	self assert: (aGame indexOfCellWith: aShip) equals: 10
@@ -2811,6 +2872,7 @@ GameTest >> testWhenShipLosesTwoBattlesThenSkipsATurnThenLoseAnotherBattleThenIt
 		         wormholeStart: 9
 		         wormholeEnd: 10
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
 	aGame throwDice. "+1"
 	aGame throwDice. "pierde shield"
@@ -2848,6 +2910,7 @@ GameTest >> testWhenShipRunsOutOfShieldsThenShouldLoseTwoTurns [
 		         wormholeStart: 9
 		         wormholeEnd: 10
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
 	aGame throwDice.
 	aGame throwDice.
@@ -2882,6 +2945,7 @@ GameTest >> testWhenShipRunsOutOfShieldsThenTheOtherShipMoves [
 		         wormholeStart: 9
 		         wormholeEnd: 10
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 20).
 	aGame throwDice.
 	aGame throwDice.
@@ -2919,6 +2983,7 @@ GameTest >> testWhenShipRunsOutOfShieldsThenTwoTurnsLaterCanPlay [
 		         wormholeStart: 9
 		         wormholeEnd: 10
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
 	aGame throwDice.
 	aGame throwDice.
@@ -3077,11 +3142,12 @@ GameTest >> testWhenShipsEntersToAWormholeAndThereIsAnotherShipInTheOtherWormhol
 		         wormholeStart: 4
 		         wormholeEnd: 5
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
 	aGame throwDice.
 	aGame throwDice.
-	
-	self assert: (aGame indexOfCellWith: anotherShip) equals: 1.
+
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 1
 ]
 
 { #category : #tests }
@@ -3102,6 +3168,7 @@ GameTest >> testWhenTheFirstShipCompletedTheRequiredLapsThenShouldBeTheWinner [
 		         wormholeStart: 2
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
 	aGame throwDice.
 	self assert: aGame winner equals: aShip
@@ -3141,6 +3208,7 @@ GameTest >> testWhenThirdShipEntersToAnAtomicBombCellAndThenFirstShipRollsNineIn
 		         wormholeStart: 3
 		         wormholeEnd: 4
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 	aGame throwDice.
 	aGame throwDice.
@@ -3172,6 +3240,7 @@ GameTest >> testWhenTwoShipsBattleAndItsADrawTheSecondShipGoesBackToFirstCell [
 		         wormholeStart: 9
 		         wormholeEnd: 10
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
 	aGame throwDice.
 	aGame throwDice.
@@ -3197,6 +3266,7 @@ GameTest >> testWhenTwoShipsBattleAndTheFirstShipWinsTheSecondShipGoesBackToFirs
 		         wormholeStart: 9
 		         wormholeEnd: 10
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
 	aGame throwDice.
 	aGame throwDice.
@@ -3235,6 +3305,7 @@ GameTest >> testWhenTwoShipsEnterToAHyperJumpCellThenShouldMoveTheDesiredAmountO
 		         wormholeStart: 5
 		         wormholeEnd: 6
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 
 	aGame throwDice.
@@ -3393,6 +3464,7 @@ GameTest >> testWhenUsingACardThatsNotInTheShipDeckThenShouldRaiseError [
 		         wormholeStart: 2
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10).
 	aSpeedCard := SpeedCard new.
 	self

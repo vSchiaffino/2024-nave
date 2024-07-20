@@ -14,12 +14,12 @@ LoadedDeck class >> cards: someCardsToDraw [
 ]
 
 { #category : #drawing }
-LoadedDeck >> drawCard [
+LoadedDeck >> dealTo: aShip [
 
 	| drawedCard |
 	drawedCard := cardsToDraw removeFirst.
 	cardsToDraw addLast: drawedCard.
-	^ drawedCard
+	aShip receive: drawedCard
 ]
 
 { #category : #initialization }

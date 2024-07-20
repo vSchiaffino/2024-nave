@@ -13,9 +13,9 @@ Class {
 }
 
 { #category : #'instance creation' }
-Ship class >> named: aShipName cards: someCards [
+Ship class >> named: aShipName using: aDeck [
 
-	^ self new initializeWith: aShipName cards: someCards
+	^ self new initializeWith: aShipName using: aDeck
 ]
 
 { #category : #adding }
@@ -45,14 +45,17 @@ Ship >> cards [
 ]
 
 { #category : #initialization }
-Ship >> initializeWith: aName cards: someCards [
+Ship >> initializeWith: aName using: aDeck [
+
+	cards := OrderedCollection new.
+	aDeck dealTo: self.
+	aDeck dealTo: self.
 
 	battleModifier := NormalBattleModifier new.
 	name := aName.
 	shields := 3.
 	maxShields := 3.
 	penalty := 0.
-	cards := someCards.
 	^ self
 ]
 

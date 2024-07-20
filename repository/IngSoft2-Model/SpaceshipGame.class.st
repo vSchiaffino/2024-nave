@@ -11,10 +11,26 @@ Class {
 }
 
 { #category : #'instance creation' }
-SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation lengthInParsecs: aLengthInParsecs [
+SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation lengthInParsecs: aLengthInParsecs cellGenerator: aCellGenerator deck: aDeck [
+
+	^ self new
+		  initializeWith: someShips
+		  lapsToWin: aNumberOfLapsToWin
+		  using: someDice
+		  withCells: anAmountOfCells
+		  wormholeStart: aWormholeStartLocation
+		  wormholeEnd: aWormholeEndLocation
+		  lengthInParsecs: aLengthInParsecs
+		  cellGenerator: aCellGenerator
+		  deck: aDeck
+]
+
+{ #category : #'instance creation' }
+SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation lengthInParsecs: aLengthInParsecs withNumberOfCards: aNumberOfCards [
 
 	| defaultCellGenerator defaultDeck defaultProbabilities |
 	defaultProbabilities := OrderedCollection new.
+	defaultDeck := Deck length: aNumberOfCards.
 	defaultProbabilities
 		add: {
 				(3 / 10).
@@ -40,11 +56,10 @@ SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: some
 				[ AtomicBombCell new ] };
 		add: {
 				(1 / 10).
-				[ CardGivingCell new ] }.
+				[ CardGivingCell deck: defaultDeck ] }.
 	defaultCellGenerator := CellGenerator
 		                        length: anAmountOfCells
 		                        probabilites: defaultProbabilities.
-	defaultDeck := Deck new.
 	^ self
 		  with: someShips
 		  lapsToWin: aNumberOfLapsToWin
@@ -58,9 +73,10 @@ SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: some
 ]
 
 { #category : #'instance creation' }
-SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation lengthInParsecs: aLengthInParsecs cellGenerator: aCellGenerator [
+SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation lengthInParsecs: aLengthInParsecs withNumberOfCards: aNumberOfCards cellGenerator: aCellGenerator [
+
 	| defaultDeck |
-	defaultDeck := Deck new.
+	defaultDeck := Deck length: aNumberOfCards.
 	^ self new
 		  initializeWith: someShips
 		  lapsToWin: aNumberOfLapsToWin
@@ -70,22 +86,7 @@ SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: some
 		  wormholeEnd: aWormholeEndLocation
 		  lengthInParsecs: aLengthInParsecs
 		  cellGenerator: aCellGenerator
-		  deck: defaultDeck 
-]
-
-{ #category : #'instance creation' }
-SpaceshipGame class >> with: someShips lapsToWin: aNumberOfLapsToWin using: someDice withCells: anAmountOfCells wormholeStart: aWormholeStartLocation wormholeEnd: aWormholeEndLocation lengthInParsecs: aLengthInParsecs cellGenerator: aCellGenerator deck: aDeck [
-
-	^ self new
-		  initializeWith: someShips
-		  lapsToWin: aNumberOfLapsToWin
-		  using: someDice
-		  withCells: anAmountOfCells
-		  wormholeStart: aWormholeStartLocation
-		  wormholeEnd: aWormholeEndLocation
-		  lengthInParsecs: aLengthInParsecs
-		  cellGenerator: aCellGenerator
-		  deck: aDeck
+		  deck: defaultDeck
 ]
 
 { #category : #accessing }
@@ -149,12 +150,7 @@ SpaceshipGame >> initializeWith: someShipNames lapsToWin: aNumberOfLapsToWin usi
 
 	dice := someDice.
 	ships := someShipNames collect: [ :eachShipName |
-		         Ship
-			         named: eachShipName
-			         cards:
-			         (OrderedCollection
-				          with: aDeck drawCard
-				          with: aDeck drawCard) ].
+		         Ship named: eachShipName using: aDeck ].
 	board := Board
 		         withShips: ships
 		         lengthInParsecs: aLengthInParsecs

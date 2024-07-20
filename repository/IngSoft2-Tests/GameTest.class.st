@@ -2059,6 +2059,91 @@ GameTest >> testWhenNoCardsLeftInDeckThenUseARepeatCardThenLandsInACardGivingCel
 ]
 
 { #category : #tests }
+GameTest >> testWhenNoCardsLeftInDeckThenUsesAMercenaryThenCancelsThatCardThenLandsTwoTimesInACardGivingCellShouldHaveTwoCards [
+
+	| aShip someShips aGame someDice someCells aDeck someCards aMercenaryCard aCancelationCard anotherShip |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 4 1 ) asOrderedCollection)).
+	aDeck := Deck cards: (OrderedCollection
+			          with: MercenaryCard new
+			          with: CancellationCard new
+			          with: MercenaryCard new
+			          with: CancellationCard new).
+	someCells := OrderedCollection new.
+	someCells
+		add: NormalCell new;
+		add: (CardGivingCell deck: aDeck);
+		add: (CardGivingCell deck: aDeck);
+		add: NormalCell new;
+		add: NormalCell new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells size
+		         wormholeStart: 4
+		         wormholeEnd: 5
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator cells: someCells)
+		         deck: aDeck.
+	someCards := aGame cardsOf: aShip.
+	aMercenaryCard := someCards first.
+	aCancelationCard := someCards second.
+	aGame playCard: aMercenaryCard by: aShip target: anotherShip.
+	aGame playCard: aCancelationCard by: aShip target: aMercenaryCard.
+	self assert: (aGame cardsOf: aShip) size equals: 0.
+	aGame throwDice.
+	aGame throwDice.
+	aGame throwDice.
+	self assert: (aGame cardsOf: aShip) size equals: 2
+]
+
+{ #category : #tests }
+GameTest >> testWhenNoCardsLeftInDeckThenUsesASpeedCardThenCancelsThatCardThenLandsTwoTimesInACardGivingCellShouldHaveTwoCards [
+
+	| aShip someShips aGame someDice someCells aDeck someCards aSpeedCard aCancelationCard |
+	aShip := 'test-ship-1'.
+	someShips := OrderedCollection with: aShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 1 ) asOrderedCollection)).
+	aDeck := Deck cards:
+		         (OrderedCollection
+			          with: SpeedCard new
+			          with: CancellationCard new).
+	someCells := OrderedCollection new.
+	someCells
+		add: NormalCell new;
+		add: (CardGivingCell deck: aDeck);
+		add: (CardGivingCell deck: aDeck);
+		add: NormalCell new;
+		add: NormalCell new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells size
+		         wormholeStart: 4
+		         wormholeEnd: 5
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator cells: someCells)
+		         deck: aDeck.
+	someCards := aGame cardsOf: aShip.
+	aSpeedCard := someCards first.
+	aCancelationCard := someCards second.
+	aGame playCard: aSpeedCard by: aShip target: aShip.
+	aGame playCard: aCancelationCard by: aShip target: aSpeedCard.
+	self assert: (aGame cardsOf: aShip) size equals: 0.
+	aGame throwDice.
+	aGame throwDice.
+	self assert: (aGame cardsOf: aShip) size equals: 2
+]
+
+{ #category : #tests }
 GameTest >> testWhenNoShipCompletedTheLapsThenGameShouldNotBeOver [
 
 	| aShip aGame someDice someShips |

@@ -2,10 +2,17 @@ Class {
 	#name : #Deck,
 	#superclass : #Object,
 	#instVars : [
-		'cards'
+		'cards',
+		'discardedCards'
 	],
 	#category : #'IngSoft2-Model'
 }
+
+{ #category : #accessing }
+Deck class >> cards: someCards [
+
+	^ self new initializeWithCards: someCards
+]
 
 { #category : #accessing }
 Deck class >> length: aNumberOfCards [
@@ -22,8 +29,8 @@ Deck >> dealTo: aShip [
 { #category : #drawing }
 Deck >> initializeWith: aNumberOfCards [
 
-	| cardCreators cardCreatorBlock createdCard |
-	cards := OrderedCollection new.
+	| cardCreators cardCreatorBlock createdCard initialCards |
+	initialCards := OrderedCollection new.
 	cardCreators := {
 		                [ AccelerationCard new ].
 		                [ CancellationCard new ].
@@ -34,5 +41,13 @@ Deck >> initializeWith: aNumberOfCards [
 	1 to: aNumberOfCards do: [ :index |
 		cardCreatorBlock := cardCreators atRandom.
 		createdCard := cardCreatorBlock value.
-		cards add: createdCard ]
+		initialCards add: createdCard ].
+	self initializeWithCards: initialCards
+]
+
+{ #category : #drawing }
+Deck >> initializeWithCards: someCards [
+
+	discardedCards := OrderedCollection new.
+	cards := someCards
 ]

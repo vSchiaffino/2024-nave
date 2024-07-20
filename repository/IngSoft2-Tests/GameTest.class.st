@@ -63,7 +63,7 @@ GameTest >> testIfAShipCrossesTheLineToWinTheGameBecauseOfARepeatCardItShouldWin
 		         wormholeEnd: 4
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	deck := aGame cardsOf: aShip.
 	aRepeatCard := deck first.
 	aGame throwDice.
@@ -83,6 +83,8 @@ GameTest >> testIfAShipPlaysAInstantCardAndItsNotItsTurnShouldApplyEffect [
 			             (LoadedDie sequence: #( 1 1 ) asOrderedCollection)).
 	cardsToDraw := OrderedCollection
 		               with: AccelerationCard new
+		               with: CancellationCard new
+		               with: AccelerationCard new
 		               with: CancellationCard new.
 	aGame := SpaceshipGame
 		         with: someShips
@@ -93,15 +95,18 @@ GameTest >> testIfAShipPlaysAInstantCardAndItsNotItsTurnShouldApplyEffect [
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	shipCards := aGame cardsOf: aShip.
 	anotherShipCards := aGame cardsOf: anotherShip.
 	anAccelerationCard := shipCards first.
 	aCancellationCard := anotherShipCards second.
-	
+
 	aGame playCard: anAccelerationCard by: aShip.
 	aGame throwDice. "turno test-ship-1"
-	aGame playCard: aCancellationCard by: anotherShip target: anAccelerationCard.
+	aGame
+		playCard: aCancellationCard
+		by: anotherShip
+		target: anAccelerationCard.
 	aGame throwDice. "turno test-ship-2"
 
 	self assert: (aGame indexOfCellWith: anotherShip) equals: 2
@@ -129,7 +134,7 @@ GameTest >> testIfAShipPlaysAPermanentCardAndItsNotItsTurnShouldThrowAnError [
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	cards := aGame cardsOf: aShip.
 	anAccelerationCard := cards first.
 	anotherAccelerationCard := cards second.
@@ -166,7 +171,7 @@ GameTest >> testIfAWormholeStartsAndEndsInTheSameCellItShouldThrowAnError [
 				         lengthInParsecs: 100
 				         cellGenerator:
 				         (FixedCellGenerator allNormalCellsWith: 10)
-				         deck: (LoadedDeck cards: cardsToDraw) ]
+				         deck: (Deck cards: cardsToDraw) ]
 		raise: Error
 		withMessage: 'wormhole cannot start and end in the same cell!'
 ]
@@ -219,7 +224,7 @@ GameTest >> testIfNoTurnWasPlayedThenRepeatCardShouldNotHaveEffect [
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	deck := aGame cardsOf: aShip.
 	aRepeatCard := deck first.
 	aGame playCard: aRepeatCard by: aShip target: aShip.
@@ -248,7 +253,7 @@ GameTest >> testIfStackTwoSpeedCardsThenShouldMoveTwoCellsMore [
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	deck := aGame cardsOf: aShip.
 	aSpeedCard := deck first.
 	anotherSpeedCard := deck second.
@@ -281,7 +286,7 @@ GameTest >> testIfTryToUseTheSameCardAgainShouldRaiseError [
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: someCardToDraw).
+		         deck: (Deck cards: someCardToDraw).
 	deck := aGame cardsOf: aShip.
 	aSpeedCard := deck first.
 	aGame playCard: aSpeedCard by: aShip target: aShip.
@@ -318,7 +323,7 @@ GameTest >> testWhenAMercenaryBattlesThenTheMercenaryCardUserShouldNotHelp [
 		         wormholeEnd: 99
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	cards := aGame cardsOf: aShip.
 	aMercenaryCard := cards first.
 	aGame playCard: aMercenaryCard by: aShip target: yetAnotherShip.
@@ -357,7 +362,7 @@ GameTest >> testWhenAShipAndItsMercenaryLosesABattleThenTheyShouldMoveToTheStart
 		         wormholeEnd: 99
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	cards := aGame cardsOf: aShip.
 	aMercenaryCard := cards first.
 	aGame playCard: aMercenaryCard by: aShip target: yetAnotherShip.
@@ -625,7 +630,7 @@ GameTest >> testWhenAShipHasTwoMercenariesThenTheyShouldHelpInABattle [
 		         wormholeEnd: 99
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	cards := aGame cardsOf: aShip.
 	aMercenaryCard := cards first.
 	anotherMercenaryCard := cards second.
@@ -694,7 +699,7 @@ GameTest >> testWhenAShipPlaysASpeedCardThenTheOtherShipShouldntMoveOneMoreCell 
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	deck := aGame cardsOf: aShip.
 	aSpeedCard := deck first.
 	aGame playCard: aSpeedCard by: aShip target: aShip.
@@ -730,7 +735,7 @@ GameTest >> testWhenAShipPlaysAnAccelerationCardThenAllShipsShouldMoveOneMoreCel
 		         wormholeEnd: 99
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	deck := aGame cardsOf: aShip.
 	anAccelerationCard := deck first.
 	aGame playCard: anAccelerationCard by: aShip.
@@ -758,7 +763,9 @@ GameTest >> testWhenAShipPlaysCancellationCardAndCardToRemoveIsSpeedCardAndThere
 		               with: AccelerationCard new
 		               with: CancellationCard new
 		               with: CancellationCard new
+		               with: SpeedCard new
 		               with: SpeedCard new.
+	aSpeedCard := cardsToDraw third.
 	aGame := SpaceshipGame
 		         with: someShips
 		         lapsToWin: 2
@@ -768,17 +775,22 @@ GameTest >> testWhenAShipPlaysCancellationCardAndCardToRemoveIsSpeedCardAndThere
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
+
 	aDeck := aGame cardsOf: aShip.
 	anotherDeck := aGame cardsOf: anotherShip.
 	anAccelerationCard := aDeck first.
 	aCancellationCard := anotherDeck first.
-	aSpeedCard := cardsToDraw third.
+
 
 	aGame playCard: anAccelerationCard by: aShip.
 	aGame throwDice.
 	self
-		should: [ aGame playCard: aCancellationCard by: anotherShip target: aSpeedCard ]
+		should: [
+			aGame
+				playCard: aCancellationCard
+				by: anotherShip
+				target: aSpeedCard ]
 		raise: Error
 		withMessage: 'no such card in active cards!'
 ]
@@ -839,7 +851,7 @@ GameTest >> testWhenAShipPlaysMercenaryCardAndBattlesAnotherShipShouldAddItsDice
 		         wormholeEnd: 99
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	cards := aGame cardsOf: aShip.
 	aMercenaryCard := cards first.
 	aGame playCard: aMercenaryCard by: aShip target: yetAnotherShip.
@@ -873,7 +885,7 @@ GameTest >> testWhenAShipPlaysMercenaryCardAndBattlesWithItsMercenaryThenTheySho
 		         wormholeEnd: 99
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	cards := aGame cardsOf: aShip.
 	aMercenaryCard := cards first.
 	aGame playCard: aMercenaryCard by: aShip target: yetAnotherShip .
@@ -907,7 +919,7 @@ GameTest >> testWhenAShipTargetsItselfWithAMercenaryCardShouldThrowAnError [
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aShipCards := aGame cardsOf: aShip.
 	aMercenaryCard := aShipCards first.
 
@@ -941,7 +953,7 @@ GameTest >> testWhenAShipWasDoubledAndAnotherShipBattlesWithItThenShouldDoubleIt
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	someCards := aGame cardsOf: aShip.
 	aDoubleCard := someCards first.
 
@@ -978,7 +990,7 @@ GameTest >> testWhenAShipWasDoubledAndBattlesThenShouldDoubleItDiceResult [
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	someCards := aGame cardsOf: anotherShip.
 	aDoubleCard := someCards first.
 
@@ -1021,7 +1033,7 @@ GameTest >> testWhenAShipWasDoubledAndIsAMercenaryThenIfHelpsItsDiceShouldBeDoub
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	someCards := aGame cardsOf: anotherShip.
 	aMercenaryCard := someCards first.
 	aDoubleCard := someCards second.
@@ -1064,7 +1076,7 @@ GameTest >> testWhenASpeedEffectAndMercenaryEffectAreActiveThenMercenaryShouldHe
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aDeck := aGame cardsOf: aShip.
 	aSpeedCard := aDeck first.
 	aMercenaryCard := aDeck second.
@@ -1101,7 +1113,7 @@ GameTest >> testWhenASpeedEffectAndMercenaryEffectAreActiveThenMercenaryShouldNo
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aDeck := aGame cardsOf: aShip.
 	aSpeedCard := aDeck first.
 	aMercenaryCard := aDeck second.
@@ -1145,7 +1157,7 @@ GameTest >> testWhenBothShipsHaveMercenariesThenBothShouldHelp [
 		         wormholeEnd: 99
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	someCards := aGame cardsOf: aShip.
 	someOtherCards := aGame cardsOf: anotherShip.
 
@@ -1192,7 +1204,7 @@ GameTest >> testWhenCancelAMercenaryCardThenShouldNotApplyTheCardEffect [
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aShipCards := aGame cardsOf: aShip.
 	anotherShipCards := aGame cardsOf: anotherShip.
 
@@ -1231,7 +1243,7 @@ GameTest >> testWhenCancelAMercenaryShipWhenThereIsAnotherPermanentCardItShouldN
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aDeck := aGame cardsOf: aShip.
 	otherDeck := aGame cardsOf: anotherShip.
 	aSpeedCard := aDeck first.
@@ -1307,7 +1319,7 @@ GameTest >> testWhenCancelAnAccelerationCardThenShouldNotApplyTheCardEffect [
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aShipCards := aGame cardsOf: aShip.
 	anotherShipCards := aGame cardsOf: anotherShip.
 
@@ -1333,7 +1345,10 @@ GameTest >> testWhenGameIsOverAndTryToUseAPermanentCardThenShouldThrowError [
 	someDice := Dice withAll:
 		            (Set with:
 			             (LoadedDie sequence: #( 20 ) asOrderedCollection)).
+
 	cardsToDraw := OrderedCollection
+		               with: SpeedCard new
+		               with: SpeedCard new
 		               with: SpeedCard new
 		               with: SpeedCard new.
 	aGame := SpaceshipGame
@@ -1345,13 +1360,14 @@ GameTest >> testWhenGameIsOverAndTryToUseAPermanentCardThenShouldThrowError [
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aGame throwDice.
 
 	deck := aGame cardsOf: anotherShip.
 	aSpeedCard := deck first.
 	self
-		should: [ aGame playCard: aSpeedCard by: anotherShip target: anotherShip]
+		should: [
+		aGame playCard: aSpeedCard by: anotherShip target: anotherShip ]
 		raise: Error
 		withMessage: 'game is over!'
 ]
@@ -1377,7 +1393,7 @@ GameTest >> testWhenGameIsOverAndTryToUseAnInstantCardThenShouldThrowError [
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aGame throwDice.
 
 	deck := aGame cardsOf: aShip.
@@ -1494,7 +1510,7 @@ GameTest >> testWhenLastEffectWasAtomicBombCellAndUseTheRepeatCardThenShouldAppl
 		         wormholeEnd: 4
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aRepeatCard := (aGame cardsOf: aShip) first.
 	aGame throwDice.
 	aGame throwDice.
@@ -1540,7 +1556,7 @@ GameTest >> testWhenLastEffectWasBlackHoleAndUseTheRepeatCardThenShouldApplyTheE
 		         wormholeEnd: 6
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aRepeatCard := (aGame cardsOf: aShip) first.
 	aGame throwDice.
 	aGame playCard: aRepeatCard by: aShip target: aShip.
@@ -1581,7 +1597,7 @@ GameTest >> testWhenLastEffectWasCardGivingCellAndUseTheRepeatCardThenShouldAppl
 		         wormholeEnd: 5
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aRepeatCard := (aGame cardsOf: aShip) first.
 	aGame throwDice.
 	aGame playCard: aRepeatCard by: aShip target: aShip.
@@ -1628,7 +1644,7 @@ GameTest >> testWhenLastEffectWasHyperJumpAndUseTheRepeatCardThenShouldApplyTheE
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aRepeatCard := (aGame cardsOf: aShip) first.
 	aGame throwDice.
 	aGame playCard: aRepeatCard by: aShip target: aShip.
@@ -1678,7 +1694,7 @@ GameTest >> testWhenLastEffectWasHyperSpaceJumpAndUseTheRepeatCardThenShouldAppl
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aRepeatCard := (aGame cardsOf: aShip) first.
 	aGame throwDice.
 	aGame playCard: aRepeatCard by: aShip target: aShip.
@@ -1732,7 +1748,7 @@ GameTest >> testWhenLastEffectWasMoonwalkCellAndUseTheRepeatCardThenShouldApplyT
 		         wormholeEnd: 13
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aRepeatCard := (aGame cardsOf: yetAnotherShip) first.
 	aGame throwDice.
 	aGame throwDice.
@@ -1766,7 +1782,7 @@ GameTest >> testWhenLastEffectWasNormalCellThenShouldHaveNoEffect [
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aGame throwDice.
 	deck := aGame cardsOf: aShip.
 	aRepeatCard := deck first.
@@ -1802,7 +1818,7 @@ GameTest >> testWhenLastEffectWasWormholeCellAndUseTheRepeatCardThenShouldApplyT
 		         wormholeEnd: 3
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	someCards := aGame cardsOf: aShip.
 	aRepeatCard := someCards first.
 
@@ -1833,7 +1849,7 @@ GameTest >> testWhenMercenaryShipBattlesWithTheMercenaryCardUserTheyShouldNotBat
 		         wormholeEnd: 99
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	cards := aGame cardsOf: aShip.
 	aMercenaryCard := cards first.
 	aGame playCard: aMercenaryCard by: aShip target: anotherShip.
@@ -1922,7 +1938,7 @@ GameTest >> testWhenPlayAAccelerationCardAndThenARedoCardThenShouldApplyTheAcele
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	deck := aGame cardsOf: aShip.
 	anAccelerationCard := deck first.
 	aRedoCard := deck second.
@@ -1957,7 +1973,7 @@ GameTest >> testWhenPlayACancellationCardAndThenARedoCardThenShouldApplyTheCance
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aDeck := aGame cardsOf: aShip.
 	otherDeck := aGame cardsOf: anotherShip.
 
@@ -2012,7 +2028,7 @@ GameTest >> testWhenPlayAMercenaryCardAndItsNotTheShipTurnThenShouldThrow [
                  wormholeEnd: 99
                  lengthInParsecs: 100
                  cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
-                 deck: (LoadedDeck cards: cardsToDraw).
+                 deck: (Deck cards: cardsToDraw).
     someCards := aGame cardsOf: aShip.
     aMercenaryCard := someCards first.
 
@@ -2051,7 +2067,7 @@ GameTest >> testWhenPlayARepeatCardAndThenARedoCardThenShouldRepeatTheEffectTwic
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aGame throwDice.
 	aDeck := aGame cardsOf: aShip.
 	aRepeatCard := aDeck first.
@@ -2092,7 +2108,7 @@ GameTest >> testWhenPlaysAMercenaryCardThenPlaysARedoCardThenShouldAddAMercenary
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
-		         deck: (LoadedDeck cards: someCardsToDraw).
+		         deck: (Deck cards: someCardsToDraw).
 	cards := aGame cardsOf: aShip.
 	aMercenaryCard := cards first.
 	aRedoCard := cards second.
@@ -2124,7 +2140,7 @@ GameTest >> testWhenPlaysASpeedCardThenPlaysARedoCardThenPlaysAnotherRedoCardSho
     someCells := OrderedCollection new.
     someCells
         add: NormalCell new;
-        add: (CardGivingCell deck: (LoadedDeck cards: anotherCardsToDraw));
+        add: (CardGivingCell deck: (Deck cards: anotherCardsToDraw));
         add: NormalCell new;
         add: NormalCell new;
         add: NormalCell new;
@@ -2143,7 +2159,7 @@ GameTest >> testWhenPlaysASpeedCardThenPlaysARedoCardThenPlaysAnotherRedoCardSho
                  wormholeEnd: 9
                  lengthInParsecs: 100
                  cellGenerator: (FixedCellGenerator cells: someCells)
-                 deck: (LoadedDeck cards: someCardsToDraw).
+                 deck: (Deck cards: someCardsToDraw).
 
     aGame throwDice.
     cards := aGame cardsOf: aShip.
@@ -2182,7 +2198,7 @@ GameTest >> testWhenPlaysASpeedCardThenPlaysARedoCardThenShouldMoveTwoMoreCells 
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
-		         deck: (LoadedDeck cards: someCardsToDraw).
+		         deck: (Deck cards: someCardsToDraw).
 	aDeck := aGame cardsOf: aShip.
 	aSpeedCard := aDeck first.
 	aRedoCard := aDeck second.
@@ -2216,7 +2232,7 @@ GameTest >> testWhenPlaysASpeedCardThenShouldMoveOneMoreCell [
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	deck := aGame cardsOf: aShip.
 	aSpeedCard := deck first.
 	aGame playCard: aSpeedCard by: aShip target: aShip.
@@ -2294,7 +2310,7 @@ GameTest >> testWhenShipAndItsMercenaryLoseThreeTimesThenTheyShouldLoseTwoTurns 
 		         wormholeEnd: 99
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	cards := aGame cardsOf: aShip.
 	aMercenaryCard := cards first.
 	aGame playCard: aMercenaryCard by: aShip target: yetAnotherShip.
@@ -2691,7 +2707,7 @@ GameTest >> testWhenShipHasTwoShieldsThenUseADefendCardThenShouldHaveThreeShield
 		         wormholeEnd: 10
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	someCards := aGame cardsOf: anotherShip.
 	aDefendCard := someCards first.
 
@@ -2742,7 +2758,7 @@ GameTest >> testWhenShipHasTwoShieldsThenUseADefendCardWhenTheShieldsAreRestored
 		         wormholeEnd: 10
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	someCards := aGame cardsOf: anotherShip.
 	aDefendCard := someCards first.
 
@@ -3032,7 +3048,7 @@ GameTest >> testWhenShipUsesDefendCardThenRunsOutOfShieldsThenShouldRunOfShields
 		         wormholeEnd: 10
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	someCards := aGame cardsOf: anotherShip.
 	aDefendCard := someCards first.
 	aGame playCard: aDefendCard by: anotherShip target: anotherShip.
@@ -3096,7 +3112,7 @@ GameTest >> testWhenShipUsesTwoDefendCardInARowHavingThreeShieldsThenShouldHaveF
 		         wormholeEnd: 10
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	someCards := aGame cardsOf: anotherShip.
 	aDefendCard := someCards first.
 	anotherDefendCard := someCards second.
@@ -3343,7 +3359,7 @@ GameTest >> testWhenTwoShipsHaveMercenariesAndCancelOneThenTheOtherShouldKeepHav
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
-		         deck: (LoadedDeck cards: cardsToDraw).
+		         deck: (Deck cards: cardsToDraw).
 	aShipCards := aGame cardsOf: aShip.
 	anotherShipCards := aGame cardsOf: anotherShip.
 
@@ -3368,43 +3384,50 @@ GameTest >> testWhenTwoShipsHaveMercenariesAndCancelOneThenTheOtherShouldKeepHav
 { #category : #tests }
 GameTest >> testWhenTwoShipsTargetTheSameShipAsMercenaryShouldThrowError [
 
-    | aShip aGame someShips someDice cards cardsToDraw aMercenaryCard anotherShip yetAnotherShip anotherCards anotherMercenaryCard |
-    aShip := 'test-ship-1'.
-    anotherShip := 'test-ship-2'.
-    yetAnotherShip := 'test-ship-3'.
-    someShips := OrderedCollection
-                     with: aShip
-                     with: anotherShip
-                     with: yetAnotherShip.
-    someDice := Dice withAll:
-                    (Set with:
-                         (LoadedDie sequence:
-                              #( 1 1 10 5 19 ) asOrderedCollection)).
-    cardsToDraw := OrderedCollection
-                       with: MercenaryCard new
-                       with: MercenaryCard new.
-    aGame := SpaceshipGame
-                 with: someShips
-                 lapsToWin: 2
-                 using: someDice
-                 withCells: 100
-                 wormholeStart: 98
-                 wormholeEnd: 99
-                 lengthInParsecs: 100
-                 cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
-                 deck: (LoadedDeck cards: cardsToDraw).
-    cards := aGame cardsOf: aShip.
-    anotherCards := aGame cardsOf: anotherShip.
-    aMercenaryCard := cards first.
-    anotherMercenaryCard := anotherCards first.
+	| aShip aGame someShips someDice cards cardsToDraw aMercenaryCard anotherShip yetAnotherShip anotherCards anotherMercenaryCard |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	yetAnotherShip := 'test-ship-3'.
+	someShips := OrderedCollection
+		             with: aShip
+		             with: anotherShip
+		             with: yetAnotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence:
+				              #( 1 1 10 5 19 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection
+		               with: MercenaryCard new
+		               with: MercenaryCard new
+		               with: MercenaryCard new
+		               with: MercenaryCard new
+		               with: MercenaryCard new
+		               with: MercenaryCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 2
+		         using: someDice
+		         withCells: 100
+		         wormholeStart: 98
+		         wormholeEnd: 99
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
+		         deck: (Deck cards: cardsToDraw).
+	cards := aGame cardsOf: aShip.
+	anotherCards := aGame cardsOf: anotherShip.
+	aMercenaryCard := cards first.
+	anotherMercenaryCard := anotherCards first.
 
-    aGame playCard: aMercenaryCard by: aShip target: yetAnotherShip.
-    aGame throwDice. "turno test-ship-1"
-    self
-        should: [ aGame playCard: anotherMercenaryCard by: anotherShip target: yetAnotherShip]
-        raise: Error
-        withMessage: 'that ship is already a mercenary!'.
-
+	aGame playCard: aMercenaryCard by: aShip target: yetAnotherShip.
+	aGame throwDice. "turno test-ship-1"
+	self
+		should: [
+			aGame
+				playCard: anotherMercenaryCard
+				by: anotherShip
+				target: yetAnotherShip ]
+		raise: Error
+		withMessage: 'that ship is already a mercenary!'
 ]
 
 { #category : #tests }
@@ -3433,7 +3456,7 @@ GameTest >> testWhenUsesARedoCardAfterAPermanentCardAndItsNotTheShipTurnShouldTh
 		         wormholeEnd: 9
 		         lengthInParsecs: 100
 		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 100)
-		         deck: (LoadedDeck cards: someCardsToDraw).
+		         deck: (Deck cards: someCardsToDraw).
 	cards := aGame cardsOf: aShip.
 	aSpeedCard := cards first.
 	aRedoCard := cards second.

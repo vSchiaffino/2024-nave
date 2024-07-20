@@ -26,13 +26,13 @@ Board class >> withShips: someShips lengthInParsecs: anAmountOfLengthInParsecs l
 		  cellGenerator: aCellGenerator
 ]
 
-{ #category : #accessing }
+{ #category : #'helper methods' }
 Board >> allShips [
 
 	^ lapsPerShip keys asSet
 ]
 
-{ #category : #'helper methods' }
+{ #category : #accessing }
 Board >> anyShipCompletedAllLaps [
 
 	^ lapsPerShip anySatisfy: [ :lapsByEachShip |
@@ -56,7 +56,7 @@ Board >> applyLastEffectTo: aShipName [
 	lastCellEffectUsed applyEffectTo: aShip in: self
 ]
 
-{ #category : #'helper methods' }
+{ #category : #'ship collision' }
 Board >> checkIf: shipToPlay IsCollidingIn: aGame [
 
 	| aCell |
@@ -114,7 +114,7 @@ Board >> move: aShip by: anAmount [
 	nextCell enters: aShip
 ]
 
-{ #category : #movement }
+{ #category : #'cell effect' }
 Board >> moveAllShips: times except: aShip [
 
 	| allShips |
@@ -123,7 +123,7 @@ Board >> moveAllShips: times except: aShip [
 	allShips do: [ :eachShip | self move: eachShip by: times ]
 ]
 
-{ #category : #movement }
+{ #category : #'cell effect' }
 Board >> moveAllShipsToTheStart [
 
 	self allShips do: [ :eachShip | self moveToTheStart: eachShip ]
@@ -138,7 +138,7 @@ Board >> moveToTheStart: aShip [
 	cells first enters: aShip
 ]
 
-{ #category : #'ship order' }
+{ #category : #accessing }
 Board >> orderedShips [
 
 	| sortByRankBlock |
@@ -162,7 +162,7 @@ Board >> rank: aShip [
 	^ cellIndex + (lapsDone * cells size)
 ]
 
-{ #category : #removing }
+{ #category : #'cell effect' }
 Board >> removeShieldFromAllShips [
 
 	self allShips do: [ :eachShip | eachShip removeShield ]

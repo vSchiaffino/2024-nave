@@ -1133,6 +1133,53 @@ GameTest >> testWhenASpeedEffectAndMercenaryEffectAreActiveThenMercenaryShouldNo
 ]
 
 { #category : #tests }
+GameTest >> testWhenAccelerationIsUsedAfterDiscardedShouldApplyEffect [
+
+	| aShip someShips aGame someDice someCells aDeck someCards aCancelationCard anAccelerationCard |
+	aShip := 'test-ship-1'.
+	someShips := OrderedCollection with: aShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 1 1 ) asOrderedCollection)).
+	aDeck := Deck cards: (OrderedCollection
+			          with: AccelerationCard new
+			          with: CancellationCard new).
+	someCells := OrderedCollection new.
+	someCells
+		add: NormalCell new;
+		add: (CardGivingCell deck: aDeck);
+		add: (CardGivingCell deck: aDeck);
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells size
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator cells: someCells)
+		         deck: aDeck.
+	someCards := aGame cardsOf: aShip.
+	anAccelerationCard := someCards first.
+	aCancelationCard := someCards second.
+
+	aGame playCard: anAccelerationCard by: aShip target: aShip.
+	aGame playCard: aCancelationCard by: aShip target: anAccelerationCard.
+	aGame throwDice. "ship 1 agarra carta"
+	aGame throwDice. "ship 1 agarra carta"
+	aGame playCard: anAccelerationCard by: aShip target: aShip.
+	aGame throwDice. "se aplica un solo acceleration"
+
+	self assert: (aGame indexOfCellWith: aShip) equals: 5
+]
+
+{ #category : #tests }
 GameTest >> testWhenBothShipsHaveMercenariesThenBothShouldHelp [
 
 	| aShip aGame someShips someDice cardsToDraw aMercenaryCard anotherShip yetAnotherShip yetAnotherAnotherShip someCards someOtherCards anotherMercenaryCard |
@@ -3521,6 +3568,54 @@ GameTest >> testWhenShipsEntersToAWormholeAndThereIsAnotherShipInTheOtherWormhol
 	aGame throwDice.
 
 	self assert: (aGame indexOfCellWith: anotherShip) equals: 1
+]
+
+{ #category : #tests }
+GameTest >> testWhenSpeedIsUsedAfterDiscardedShouldApplyEffect [
+
+	| aShip someShips aGame someDice someCells aDeck someCards aSpeedCard aCancelationCard |
+	aShip := 'test-ship-1'.
+	someShips := OrderedCollection with: aShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 1 1 1 ) asOrderedCollection)).
+	aDeck := Deck cards:
+		         (OrderedCollection
+			          with: SpeedCard new
+			          with: CancellationCard new).
+	someCells := OrderedCollection new.
+	someCells
+		add: NormalCell new;
+		add: (CardGivingCell deck: aDeck);
+		add: (CardGivingCell deck: aDeck);
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells size
+		         wormholeStart: 8
+		         wormholeEnd: 9
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator cells: someCells)
+		         deck: aDeck.
+	someCards := aGame cardsOf: aShip.
+	aSpeedCard := someCards first.
+	aCancelationCard := someCards second.
+
+	aGame playCard: aSpeedCard by: aShip target: aShip.
+	aGame playCard: aCancelationCard by: aShip target: aSpeedCard.
+	aGame throwDice. "ship 1 agarra carta"
+	aGame throwDice. "ship 1 agarra carta"
+	aGame playCard: aSpeedCard by: aShip target: aShip.
+	aGame throwDice. "se aplica un solo speed"
+
+	self assert: (aGame indexOfCellWith: aShip) equals: 5
 ]
 
 { #category : #tests }

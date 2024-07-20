@@ -8,5 +8,6 @@ Class {
 AccelerationCard >> useWith: aCardManager target: aTargetShip [
 
 	aCardManager verifyIsCardPlayerTurn.
-	aCardManager addCardEffect: (AllShipsDiceModifier createdBy: self)
+	aCardManager addCardEffect:
+		(AllShipsDiceModifier createdBy: originalCard)
 ]

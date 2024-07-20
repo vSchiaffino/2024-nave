@@ -8,5 +8,5 @@ Class {
 RepeatCard >> useWith: aCardManager target: aTargetShip [
 
 	aCardManager repeatLastCellEffectTo: aTargetShip.
-	aCardManager discard: self
+	aCardManager discard: originalCard
 ]

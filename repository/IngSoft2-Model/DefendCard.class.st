@@ -8,5 +8,5 @@ Class {
 DefendCard >> useWith: aCardManager target: aShipName [
 
 	aCardManager applyDefendTo: aShipName.
-	aCardManager discard: self
+	aCardManager discard: originalCard 
 ]

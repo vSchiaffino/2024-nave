@@ -9,5 +9,5 @@ SpeedCard >> useWith: aCardManager target: aTargetShip [
 
 	aCardManager verifyIsCardPlayerTurn.
 	aCardManager addCardEffect:
-		(OneShipDiceModifier to: aTargetShip createdBy: self)
+		(OneShipDiceModifier to: aTargetShip createdBy: originalCard)
 ]

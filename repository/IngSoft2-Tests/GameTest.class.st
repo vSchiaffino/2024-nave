@@ -3726,6 +3726,56 @@ GameTest >> testWhenTwoShipsTargetTheSameShipAsMercenaryShouldThrowError [
 ]
 
 { #category : #tests }
+GameTest >> testWhenUseAcellerationCardThenARedoThenCancelBothsEffectsShouldNotApplyAnyEffect [
+
+	| aShip someShips aGame someDice anotherShip cardsToDraw someCards someOtherCards anAccelerationCard aRedoCard aCancellationCard anotherCancellationCard |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence: #( 6 ) asOrderedCollection)).
+	cardsToDraw := OrderedCollection new.
+	cardsToDraw
+		add: AccelerationCard new;
+		add: RedoCard new;
+		add: CancellationCard new;
+		add: CancellationCard new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: 10
+		         wormholeStart: 2
+		         wormholeEnd: 3
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator allNormalCellsWith: 10)
+		         deck: (Deck cards: cardsToDraw).
+	someCards := aGame cardsOf: aShip.
+	someOtherCards := aGame cardsOf: anotherShip.
+	anAccelerationCard := someCards first.
+	aRedoCard := someCards second.
+
+	aCancellationCard := someOtherCards first.
+	anotherCancellationCard := someOtherCards second.
+
+	aGame playCard: anAccelerationCard by: aShip.
+	aGame playCard: aRedoCard by: aShip.
+
+	aGame
+		playCard: aCancellationCard
+		by: anotherShip
+		target: anAccelerationCard.
+	aGame
+		playCard: anotherCancellationCard
+		by: anotherShip
+		target: aRedoCard.
+
+	aGame throwDice.
+	self assert: (aGame indexOfCellWith: aShip) equals: 7
+]
+
+{ #category : #tests }
 GameTest >> testWhenUsesARedoCardAfterAPermanentCardAndItsNotTheShipTurnShouldThrowError [
 
 	| aShip aGame someShips someDice aSpeedCard someCardsToDraw anotherCardsToDraw cards aRedoCard anotherShip |

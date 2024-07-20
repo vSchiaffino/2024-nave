@@ -7,7 +7,8 @@ Class {
 		'deck',
 		'activeCardEffects',
 		'actualShipPlayingCard',
-		'lastUsedCard'
+		'lastUsedCard',
+		'originalCard'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -139,10 +140,10 @@ CardManager >> removeEffectOf: aCard [
 ]
 
 { #category : #'card control' }
-CardManager >> repeatLastCardWithTarget: aTarget [
+CardManager >> repeatLastCardWithTarget: aTarget by: aRedoCard [
 
 	| cardToUse |
-	cardToUse := lastUsedCard class new.
+	cardToUse := lastUsedCard class newWithOriginalCard: aRedoCard.
 	actualShipPlayingCard receive: cardToUse.
 	self playCard: cardToUse by: actualShipPlayingCard target: aTarget
 ]

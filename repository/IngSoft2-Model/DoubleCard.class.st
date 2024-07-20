@@ -8,5 +8,5 @@ Class {
 DoubleCard >> useWith: aCardManager target: aShipName [
 
 	aCardManager doubleBattleModifierTo: aShipName.
-	aCardManager discard: self
+	aCardManager discard: originalCard 
 ]

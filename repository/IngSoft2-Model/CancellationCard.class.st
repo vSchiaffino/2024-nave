@@ -9,5 +9,5 @@ CancellationCard >> useWith: aCardManager target: aTargetCard [
 
 	aCardManager removeEffectOf: aTargetCard.
 	aCardManager discard: aTargetCard.
-	aCardManager discard: self
+	aCardManager discard: originalCard
 ]

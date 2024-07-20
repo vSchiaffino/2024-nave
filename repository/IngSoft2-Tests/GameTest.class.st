@@ -1837,6 +1837,68 @@ GameTest >> testWhenLastEffectWasWormholeCellAndUseTheRepeatCardThenShouldApplyT
 ]
 
 { #category : #tests }
+GameTest >> testWhenMercenaryIsUsedAfterDiscardedShouldApplyEffect [
+
+	| aShip someShips aGame someDice someCells aDeck someCards anotherShip someOtherCards aMercenaryCard aCancellationCard |
+	aShip := 'test-ship-1'.
+	anotherShip := 'test-ship-2'.
+	someShips := OrderedCollection with: aShip with: anotherShip.
+	someDice := Dice withAll:
+		            (Set with:
+			             (LoadedDie sequence:
+				              #( 1 3 1 1 2 ) asOrderedCollection)).
+	aDeck := Deck cards: (OrderedCollection
+			          with: MercenaryCard new
+			          with: SpeedCard new
+			          with: CancellationCard new
+			          with: CancellationCard new).
+	someCells := OrderedCollection new.
+	someCells
+		add: NormalCell new;
+		add: (CardGivingCell deck: aDeck);
+		add: (CardGivingCell deck: aDeck);
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new;
+		add: NormalCell new.
+	aGame := SpaceshipGame
+		         with: someShips
+		         lapsToWin: 1
+		         using: someDice
+		         withCells: someCells size
+		         wormholeStart: 9
+		         wormholeEnd: 10
+		         lengthInParsecs: 100
+		         cellGenerator: (FixedCellGenerator cells: someCells)
+		         deck: aDeck.
+	someCards := aGame cardsOf: aShip.
+	someOtherCards := aGame cardsOf: anotherShip.
+
+	aMercenaryCard := someCards first.
+	aCancellationCard := someOtherCards first.
+
+	aGame playCard: aMercenaryCard by: aShip target: anotherShip.
+	aGame
+		playCard: aCancellationCard
+		by: anotherShip
+		target: aMercenaryCard.
+
+	aGame throwDice. "ship 1 agarra carta"
+	aGame throwDice. "ship 2 juega"
+	aGame throwDice. "ship 1 agarra carta"
+	aGame throwDice. "ship 2 juega"
+	aGame playCard: aMercenaryCard by: aShip target: anotherShip.
+	aGame throwDice. "no deberian pelean ship 1 y 2"
+
+	self assert: (aGame indexOfCellWith: aShip) equals: 5.
+	self assert: (aGame indexOfCellWith: anotherShip) equals: 5
+]
+
+{ #category : #tests }
 GameTest >> testWhenMercenaryShipBattlesWithTheMercenaryCardUserTheyShouldNotBattle [
 
 	| aShip aGame someShips someDice cards cardsToDraw aMercenaryCard anotherShip |

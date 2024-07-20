@@ -41,7 +41,7 @@ CardManager >> applyDefendTo: aShipName [
 
 	| ship |
 	ship := self shipNamed: aShipName.
-	ship applyDefendEffect
+	ship addShield
 ]
 
 { #category : #'card effect' }

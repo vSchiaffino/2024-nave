@@ -165,7 +165,7 @@ Board >> rank: aShip [
 { #category : #'cell effect' }
 Board >> removeShieldFromAllShips [
 
-	self allShips do: [ :eachShip | eachShip removeShield ]
+	self allShips do: [ :eachShip | eachShip loseShield ]
 ]
 
 { #category : #accessing }

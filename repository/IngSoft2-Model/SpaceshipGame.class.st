@@ -115,7 +115,7 @@ SpaceshipGame >> handleBattleBetween: actualShip and: collidingShip [
 	loserShipAllies := cardManager mercenariesOf: loserShip.
 	allLosers := loserShipAllies copyWith: loserShip.
 	allLosers do: [ :eachLoser |
-		eachLoser removeShield.
+		eachLoser loseShield.
 		board moveToTheStart: eachLoser ]
 ]
 

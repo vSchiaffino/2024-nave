@@ -2,13 +2,11 @@ Class {
 	#name : #Ship,
 	#superclass : #Object,
 	#instVars : [
-		'shields',
-		'penalty',
 		'name',
 		'cards',
 		'battleModifier',
-		'maxShields',
-		'penaltyState'
+		'penaltyState',
+		'shieldManager'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -31,12 +29,10 @@ Ship >> activateNormalBattleModifier [
 	battleModifier := NormalBattleModifier new
 ]
 
-{ #category : #'card effect' }
-Ship >> applyDefendEffect [
+{ #category : #'shields logic' }
+Ship >> addShield [
 
-	shields = maxShields
-		ifTrue: [ maxShields := maxShields + 1 ]
-		ifFalse: [ shields := shields + 1 ]
+	shieldManager addShield
 ]
 
 { #category : #accessing }
@@ -59,13 +55,16 @@ Ship >> initializeWith: aName using: aDeck [
 	aDeck dealTo: self.
 	aDeck dealTo: self.
 	penaltyState := NotPenalizedState new.
-	
+	shieldManager := ShieldManager new.
 	battleModifier := NormalBattleModifier new.
 	name := aName.
-	shields := 3.
-	maxShields := 3.
-	penalty := 0.
 	^ self
+]
+
+{ #category : #'shields logic' }
+Ship >> loseShield [
+
+	shieldManager loseShieldAs: self
 ]
 
 { #category : #accessing }
@@ -93,16 +92,15 @@ Ship >> removeFromDeck: aCard [
 ]
 
 { #category : #'shields logic' }
-Ship >> removeShield [
-
-	shields := shields - 1.
-	shields = 0 ifTrue: [ penaltyState := PenalizedState new ]
-]
-
-{ #category : #'shields logic' }
 Ship >> restoreShields [
 
-	shields := maxShields
+	shieldManager restoreShields
+]
+
+{ #category : #'penalty logic' }
+Ship >> startPenalty [
+
+	penaltyState := PenalizedState new
 ]
 
 { #category : #'dice throw' }

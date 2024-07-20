@@ -7,5 +7,6 @@ Class {
 { #category : #'card effect' }
 DefendCard >> useWith: aCardManager target: aShipName [
 
-	aCardManager applyDefendTo: aShipName
+	aCardManager applyDefendTo: aShipName.
+	aCardManager discard: self
 ]

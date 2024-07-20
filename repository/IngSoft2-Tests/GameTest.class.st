@@ -1903,7 +1903,7 @@ GameTest >> testWhenNoCardsLeftInDeckThenCardGivingCellShouldNotGiveAnyCard [
 ]
 
 { #category : #tests }
-GameTest >> testWhenNoCardsLeftInDeckThenUseAInstantCardShouldBeNowInTheDeck [
+GameTest >> testWhenNoCardsLeftInDeckThenUseAPermanentCardThenCancelItShouldBeNowInTheDeck [
 
 	| aShip someShips aGame someDice someCells aDeck someCards aRepeatCard |
 	aShip := 'test-ship-1'.
@@ -1942,7 +1942,7 @@ GameTest >> testWhenNoCardsLeftInDeckThenUseAInstantCardShouldBeNowInTheDeck [
 ]
 
 { #category : #tests }
-GameTest >> testWhenNoCardsLeftInDeckThenUseAPermanentCardThenCancelItShouldBeNowInTheDeck [
+GameTest >> testWhenNoCardsLeftInDeckThenUseARepeatCardThenLandsInACardGivingCellShouldBeNowInTheDeck [
 
 	| aShip someShips aGame someDice someCells aDeck someCards aRepeatCard |
 	aShip := 'test-ship-1'.

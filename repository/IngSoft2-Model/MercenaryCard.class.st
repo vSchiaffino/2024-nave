@@ -11,5 +11,5 @@ MercenaryCard >> useWith: aCardManager target: aTargetShipName [
 	aCardManager verifyMercenaryCollision: aTargetShipName.
 	aCardManager
 		assignMercenaryShipToCardPlayer: aTargetShipName
-		by: self
+		by: originalCard
 ]

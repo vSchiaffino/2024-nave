@@ -7,7 +7,8 @@ Class {
 		'deck',
 		'activeCardEffects',
 		'actualShipPlayingCard',
-		'lastUsedCard'
+		'lastUsedCard',
+		'originalCard'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -27,9 +28,20 @@ CardManager >> addCardEffect: aCardEffect [
 { #category : #'card effect' }
 CardManager >> applyBattleModifierTo: aShip using: aDice [
 
-	| shipAllies |
+	| shipAllies shipThrowResult shipAlliesThrowResult |
 	shipAllies := self mercenariesOf: aShip.
-	^ (shipAllies collect: [ :ally | aDice throw ]) sumNumbers
+	shipThrowResult := aShip throw: aDice.
+	shipAlliesThrowResult := (shipAllies collect: [ :ally |
+		                          ally throw: aDice ]) sumNumbers.
+	^ shipThrowResult + shipAlliesThrowResult
+]
+
+{ #category : #'card usage' }
+CardManager >> applyDefendTo: aShipName [
+
+	| ship |
+	ship := self shipNamed: aShipName.
+	ship addShield
 ]
 
 { #category : #'card effect' }
@@ -38,8 +50,7 @@ CardManager >> assignMercenaryShipToCardPlayer: aNewMercenaryName by: aCard [
 	| newMercenary |
 	actualShipPlayingCard name = aNewMercenaryName ifTrue: [
 		Error signal: 'you cannot target yourself as a Mercenary!' ].
-	newMercenary := ships detect: [ :eachShip |
-		                eachShip name = aNewMercenaryName ].
+	newMercenary := self shipNamed: aNewMercenaryName.
 	activeCardEffects add: (MercenaryEffect
 			 createdBy: aCard
 			 from: actualShipPlayingCard
@@ -58,6 +69,20 @@ CardManager >> diceModifierTo: aShip [
 
 	^ (activeCardEffects collect: [ :eachCardEffect |
 		   eachCardEffect diceModifierTo: aShip name ]) sumNumbers
+]
+
+{ #category : #adding }
+CardManager >> discard: aCard [
+
+	deck discard: aCard
+]
+
+{ #category : #'card effect' }
+CardManager >> doubleBattleModifierTo: aShipName [
+
+	| aShip |
+	aShip := self shipNamed: aShipName.
+	aShip activateDoubleBattleModifier
 ]
 
 { #category : #initialization }
@@ -115,10 +140,10 @@ CardManager >> removeEffectOf: aCard [
 ]
 
 { #category : #'card control' }
-CardManager >> repeatLastCardWithTarget: aTarget [
+CardManager >> repeatLastCardWithTarget: aTarget by: aRedoCard [
 
 	| cardToUse |
-	cardToUse := lastUsedCard class new.
+	cardToUse := lastUsedCard class newWithOriginalCard: aRedoCard.
 	actualShipPlayingCard receive: cardToUse.
 	self playCard: cardToUse by: actualShipPlayingCard target: aTarget
 ]
@@ -127,6 +152,12 @@ CardManager >> repeatLastCardWithTarget: aTarget [
 CardManager >> repeatLastCellEffectTo: aShipName [
 
 	board applyLastEffectTo: aShipName
+]
+
+{ #category : #'card effect' }
+CardManager >> shipNamed: aShipName [
+
+	^ ships detect: [ :eachShip | eachShip name = aShipName ]
 ]
 
 { #category : #'helper methods' }

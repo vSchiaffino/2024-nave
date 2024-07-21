@@ -7,5 +7,7 @@ Class {
 { #category : #'card effect' }
 CancellationCard >> useWith: aCardManager target: aTargetCard [
 
-	aCardManager removeEffectOf: aTargetCard
+	aCardManager removeEffectOf: aTargetCard.
+	aCardManager discard: aTargetCard.
+	aCardManager discard: originalCard
 ]

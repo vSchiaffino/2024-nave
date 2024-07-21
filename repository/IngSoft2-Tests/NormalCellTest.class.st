@@ -132,6 +132,7 @@ NormalCellTest >> testWhenShipEntersToABlackholeCellThenLandsInAOccupiedCellThen
 		         wormholeStart: 4
 		         wormholeEnd: 5
 		         lengthInParsecs: 100
+		         withNumberOfCards: 100
 		         cellGenerator: (FixedCellGenerator cells: someCells).
 	aGame throwDice.
 	aGame throwDice.

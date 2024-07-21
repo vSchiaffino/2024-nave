@@ -13,16 +13,10 @@ CardGivingCell class >> deck: aDeck [
 	^ super new initializeWith: aDeck
 ]
 
-{ #category : #'instance creation' }
-CardGivingCell class >> new [
-
-	^ self deck: Deck new
-]
-
 { #category : #'cell effect' }
 CardGivingCell >> applyEffectTo: aShip in: aBoard [
 
-	aShip receive: deck drawCard
+	deck dealTo: aShip
 ]
 
 { #category : #initialization }

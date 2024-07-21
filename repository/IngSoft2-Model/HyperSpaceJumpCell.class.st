@@ -7,6 +7,6 @@ Class {
 { #category : #'cell effect' }
 HyperSpaceJumpCell >> applyEffectTo: aShip in: aBoard [
 
-	aShip removeShield.
+	aShip loseShield.
 	aBoard move: aShip by: 4
 ]

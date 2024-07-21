@@ -1,13 +1,43 @@
 Class {
 	#name : #Deck,
 	#superclass : #Object,
+	#instVars : [
+		'cards',
+		'discardedCards'
+	],
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #drawing }
-Deck >> drawCard [
+{ #category : #accessing }
+Deck class >> cards: someCards [
 
-	| cardCreators cardCreatorBlock |
+	^ self new initializeWithCards: someCards
+]
+
+{ #category : #accessing }
+Deck class >> length: aNumberOfCards [
+
+	^ self new initializeWith: aNumberOfCards
+]
+
+{ #category : #drawing }
+Deck >> dealTo: aShip [
+
+	cards isEmpty ifTrue: [ self shuffleDiscarded ].
+	cards isEmpty ifFalse: [ aShip receive: cards removeFirst ]
+]
+
+{ #category : #'deck control' }
+Deck >> discard: aCard [
+
+	discardedCards add: aCard
+]
+
+{ #category : #drawing }
+Deck >> initializeWith: aNumberOfCards [
+
+	| cardCreators cardCreatorBlock createdCard initialCards |
+	initialCards := OrderedCollection new.
 	cardCreators := {
 		                [ AccelerationCard new ].
 		                [ CancellationCard new ].
@@ -15,6 +45,26 @@ Deck >> drawCard [
 		                [ RepeatCard new ].
 		                [ SpeedCard new ].
 		                [ MercenaryCard new ] }.
-	cardCreatorBlock := cardCreators atRandom.
-	^ cardCreatorBlock value
+	1 to: aNumberOfCards do: [ :index |
+		cardCreatorBlock := cardCreators atRandom.
+		createdCard := cardCreatorBlock value.
+		initialCards add: createdCard ].
+	self initializeWithCards: initialCards
+]
+
+{ #category : #drawing }
+Deck >> initializeWithCards: someCards [
+
+	discardedCards := OrderedCollection new.
+	cards := someCards
+]
+
+{ #category : #drawing }
+Deck >> shuffleDiscarded [
+
+	| shuffledDiscardedCards sortRandomlyBlock |
+	sortRandomlyBlock := [ :a :b | Random new next < 0.5 ].
+	shuffledDiscardedCards := discardedCards sorted: sortRandomlyBlock.
+	discardedCards removeAll.
+	cards addAll: shuffledDiscardedCards
 ]

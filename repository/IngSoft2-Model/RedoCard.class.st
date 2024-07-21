@@ -7,7 +7,7 @@ Class {
 { #category : #'card effect' }
 RedoCard >> useWith: aCardManager target: aTarget [
 
-	aCardManager repeatLastCardWithTarget: aTarget
+	aCardManager repeatLastCardWithTarget: aTarget by: originalCard
 ]
 
 { #category : #accessing }

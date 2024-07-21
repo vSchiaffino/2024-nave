@@ -2,18 +2,37 @@ Class {
 	#name : #Ship,
 	#superclass : #Object,
 	#instVars : [
-		'shields',
-		'penalty',
 		'name',
-		'cards'
+		'cards',
+		'battleModifier',
+		'penaltyState',
+		'shieldManager'
 	],
 	#category : #'IngSoft2-Model'
 }
 
 { #category : #'instance creation' }
-Ship class >> named: aShipName cards: someCards [
+Ship class >> named: aShipName using: aDeck [
 
-	^ self new initializeWith: aShipName cards: someCards
+	^ self new initializeWith: aShipName using: aDeck
+]
+
+{ #category : #'battle modifier' }
+Ship >> activateDoubleBattleModifier [
+
+	battleModifier := DoubleBattleModifier new
+]
+
+{ #category : #'battle modifier' }
+Ship >> activateNormalBattleModifier [
+
+	battleModifier := NormalBattleModifier new
+]
+
+{ #category : #'shields logic' }
+Ship >> addShield [
+
+	shieldManager addShield
 ]
 
 { #category : #accessing }
@@ -22,14 +41,30 @@ Ship >> cards [
 	^ cards
 ]
 
-{ #category : #initialization }
-Ship >> initializeWith: aName cards: someCards [
+{ #category : #'penalty logic' }
+Ship >> endPenalty [
 
+	self restoreShields.
+	penaltyState := NotPenalizedState new
+]
+
+{ #category : #initialization }
+Ship >> initializeWith: aName using: aDeck [
+
+	cards := OrderedCollection new.
+	aDeck dealTo: self.
+	aDeck dealTo: self.
+	penaltyState := NotPenalizedState new.
+	shieldManager := ShieldManager new.
+	battleModifier := NormalBattleModifier new.
 	name := aName.
-	shields := 3.
-	penalty := 0.
-	cards := someCards.
 	^ self
+]
+
+{ #category : #'shields logic' }
+Ship >> loseShield [
+
+	shieldManager loseShieldAs: self
 ]
 
 { #category : #accessing }
@@ -41,11 +76,7 @@ Ship >> name [
 { #category : #playing }
 Ship >> playIn: aGame [
 
-	penalty > 0
-		ifTrue: [
-			penalty = 2 ifTrue: [ shields := 3 ].
-			penalty := penalty - 1 ]
-		ifFalse: [ aGame handleMovementOf: self ]
+	penaltyState playAs: self in: aGame.
 ]
 
 { #category : #'deck logic' }
@@ -61,16 +92,26 @@ Ship >> removeFromDeck: aCard [
 ]
 
 { #category : #'shields logic' }
-Ship >> removeShield [
-
-	shields := shields - 1.
-	shields = 0 ifTrue: [ penalty := 2 ]
-]
-
-{ #category : #'shields logic' }
 Ship >> restoreShields [
 
-	shields := 3
+	shieldManager restoreShields
+]
+
+{ #category : #'penalty logic' }
+Ship >> startPenalty [
+
+	penaltyState := PenalizedState new
+]
+
+{ #category : #'dice throw' }
+Ship >> throw: aDice [
+
+	| normalDiceResult modifiedDiceResult |
+	normalDiceResult := aDice throw.
+	modifiedDiceResult := battleModifier
+		                      modify: normalDiceResult
+		                      to: self.
+	^ modifiedDiceResult
 ]
 
 { #category : #'deck logic' }
